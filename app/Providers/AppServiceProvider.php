@@ -24,19 +24,19 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrap();
 
-        $superAdmin = User::where('username', 'admin')->first();
+        // $superAdmin = User::where('username', 'admin')->first();
 
-        if (!$superAdmin) {
-            // If not found, create the default Super Admin
-            User::create([
-                'name' => 'Super Admin',
-                'username' => 'admin',
-                'email' => 'grandeurv2@gmail.com',
-                'password' => Hash::make('admin123'),
-                'level' => 'Super Admin',
-                'created_at' => now('Asia/Manila'),
-                'updated_at' => now('Asia/Manila'),
-            ]);
-        }
+        // if (!$superAdmin) {
+        //     // If not found, create the default Super Admin
+        //     User::create([
+        //         'name' => 'Super Admin',
+        //         'username' => 'admin',
+        //         'email' => 'grandeurv2@gmail.com',
+        //         'password' => Hash::make('admin123'),
+        //         'level' => 'Super Admin',
+        //         'created_at' => now('Asia/Manila'),
+        //         'updated_at' => now('Asia/Manila'),
+        //     ]);
+        // }
     }
 }
