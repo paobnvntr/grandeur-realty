@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title')</title>
 
+    <meta name="description" content="Grandeur Realty is a real estate company that offers properties for sale and for rent in the Philippines.">
+    <meta name="keywords" content="real estate, properties, house and lot, apartment, condominium, lot only, commercial lot, for sale, for rent, Philippines">
+    <meta name="author" content="Grandeur Realty">
+    
+    <link rel="icon" href="{{ asset('images/grandeur-realty.jpg') }}" type="image/jpg">
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap"

@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inquiries;
 use App\Models\ListWithUs;
+use App\Models\PropertiesFeature;
 use App\Models\Property;
 use App\Models\User;
+use App\Models\HotPropertiesImage;
 use App\Notifications\NewListWithUs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -14,6 +17,12 @@ class LandingPageController extends Controller
 {
     public function home()
     {
+        $defaultImages = [
+            '../images/hero_bg_3.jpg',
+            '../images/hero_bg_2.jpg',
+            '../images/hero_bg_1.jpg'
+        ];
+
         $cities = Property::select('city')
             ->where('status', 'available')
             ->selectRaw('count(*) as property_count')
@@ -22,7 +31,22 @@ class LandingPageController extends Controller
             ->limit(6)
             ->get();
 
-        return view('landing-page.home', compact('cities'));
+        $cityImages = HotPropertiesImage::whereIn('hot_properties_name', $cities->pluck('city'))->get()->keyBy('hot_properties_name');
+
+        foreach ($cities as $city) {
+            // Check if the city has an associated image
+            if ($cityImages->has($city->city)) {
+                // Use the image from the hot_properties_images table
+                $city->image_url = asset('uploads/hot_properties/' . $cityImages->get($city->city)->image);
+            } else {
+                // Randomly select a default image
+                $city->image_url = $defaultImages[array_rand($defaultImages)];
+            }
+        }
+
+        $features = PropertiesFeature::all();
+
+        return view('landing-page.home', compact('cities', 'features'));
     }
 
     public function allProperties(Request $request)
@@ -32,7 +56,13 @@ class LandingPageController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $hotCities = Property::select('city')
+        $defaultImages = [
+            '../images/hero_bg_3.jpg',
+            '../images/hero_bg_2.jpg',
+            '../images/hero_bg_1.jpg'
+        ];
+
+        $cities = Property::select('city')
             ->where('status', 'available')
             ->selectRaw('count(*) as property_count')
             ->groupBy('city')
@@ -40,7 +70,20 @@ class LandingPageController extends Controller
             ->limit(6)
             ->get();
 
-        return view('landing-page.properties.allProperties', compact('allProperties', 'hotCities'));
+        $cityImages = HotPropertiesImage::whereIn('hot_properties_name', $cities->pluck('city'))->get()->keyBy('hot_properties_name');
+
+        foreach ($cities as $city) {
+            // Check if the city has an associated image
+            if ($cityImages->has($city->city)) {
+                // Use the image from the hot_properties_images table
+                $city->image_url = asset('uploads/hot_properties/' . $cityImages->get($city->city)->image);
+            } else {
+                // Randomly select a default image
+                $city->image_url = $defaultImages[array_rand($defaultImages)];
+            }
+        }
+
+        return view('landing-page.properties.allProperties', compact('allProperties', 'cities'));
     }
 
     public function hotProperties($city)
@@ -49,16 +92,91 @@ class LandingPageController extends Controller
             ->where('status', 'available')
             ->orderBy('created_at', 'desc')
             ->get();
-    
+
         return view('landing-page.properties.hotProperties', compact('hotProperties', 'city'));
     }
-    
+
     public function propertyDetails($id)
     {
+        // Attempt to find the property in the list_with_us table
         $property = Property::findOrFail($id);
+
+        // Decode the image JSON
         $property->image = json_decode($property->image, true);
-    
+
+        // Ensure the analytics relationship is correctly defined in your Property model
+        $analytics = $property->analytics()->first(); // Assuming 'analytics' relationship is defined
+
+        if ($analytics) {
+            // Increment existing views
+            $analytics->increment('views');
+        } else {
+            // Check if the listing actually exists in the list_with_us table
+            $listing = Property::find($id); // Ensure the model matches your table
+
+            if ($listing) {
+                // Create analytics record with initial view count
+                $listing->analytics()->create(['views' => 1]);
+            } else {
+                // Handle case where listing does not exist
+                return redirect()->route('propertyDetails', $id)->with('error', 'Property listing does not exist.');
+            }
+        }
+
         return view('landing-page.properties.detailsProperties', compact('property'));
+    }
+
+
+    public function validateSendInquiryForm(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            '_token' => 'required',
+            'property_name' => 'required',
+            'name' => 'required',
+            'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
+            'subject' => 'required',
+            'message' => 'required',
+            'termsCheckbox' => 'required',
+        ], [
+            'termsCheckbox.required' => '',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
+        } else {
+            return response()->json(['message' => 'Validation passed']);
+        }
+    }
+
+    public function saveInquiry(Request $request, $id)
+    {
+        $inquiryData = [
+            'property_name' => trim($request->property_name),
+            'name' => trim($request->name),
+            'cellphone_number' => trim($request->cellphone_number),
+            'email' => trim($request->email),
+            'subject' => trim($request->subject),
+            'message' => trim($request->message),
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ];
+
+        $createInquiry = Inquiries::create($inquiryData);
+
+        $analytics = Property::findOrFail($id)->analytics()->first();
+        if ($analytics) {
+            $analytics->increment('interactions');
+        } else {
+            $analyticsData = ['views' => 0, 'interactions' => 1];
+            Property::findOrFail($id)->analytics()->create($analyticsData);
+        }
+
+        if ($createInquiry) {
+            return redirect()->route('propertyDetails', $id)->with('success', 'Inquiry submitted successfully!');
+        } else {
+            return redirect()->route('propertyDetails', $id)->with('error', 'Failed to submit inquiry!');
+        }
     }
 
     public function listWithUsForm()
@@ -83,11 +201,14 @@ class LandingPageController extends Controller
 
             'image' => 'required|array',
             'image.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+
+            'termsCheckbox' => 'required',
         ], [
             'image.required' => 'Please upload at least one image.',
             'image.*.image' => 'The uploaded file must be an image.',
             'image.*.mimes' => 'The uploaded image must be a type of: jpeg, png, jpg',
             'image.*.max' => 'The uploaded image must not be greater than 2MB.',
+            'termsCheckbox.required' => '',
         ]);
 
         if ($validator->fails()) {
@@ -171,9 +292,13 @@ class LandingPageController extends Controller
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
             'name' => 'required',
+            'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i',
             'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'subject' => 'required',
             'message' => 'required',
+            'termsCheckbox' => 'required',
+        ], [
+            'termsCheckbox.required' => '',
         ]);
 
         if ($validator->fails()) {
@@ -187,6 +312,7 @@ class LandingPageController extends Controller
     {
         $contactUsData = [
             'name' => trim($request->name),
+            'cellphone_number' => trim($request->cellphone_number),
             'email' => trim($request->email),
             'subject' => trim($request->subject),
             'message' => trim($request->message),

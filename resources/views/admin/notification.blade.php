@@ -22,7 +22,7 @@
                         </form>
                     @endif
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
                     @if($unreadNotifications->isEmpty())
                         <p class="text-muted">No unread notifications.</p>
                     @else
@@ -43,6 +43,8 @@
                         </ul>
                     @endif
                 </div>
+
+                <div class="card-footer"></div>
             </div>
         </div>
 
@@ -51,7 +53,7 @@
                 <div class="card-header">
                     <h5>Read Notifications</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
                     @if($readNotifications->isEmpty())
                         <p class="text-muted">No read notifications.</p>
                     @else
@@ -67,6 +69,8 @@
                         </ul>
                     @endif
                 </div>
+
+                <div class="card-footer"></div>
             </div>
         </div>
     </div>

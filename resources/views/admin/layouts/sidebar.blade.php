@@ -4,10 +4,10 @@
         <!-- Logo and navigation -->
         <div class="p-2">
             <div class="brand-logo d-flex align-items-center justify-content-between">
-                <a href="./index.html" class="text-nowrap logo-img">
+                <div class="text-nowrap logo-img">
                     <!-- <img src="../assets/images/logos/logo-light.svg" alt="" /> -->
                     <h3 class="logo-text fw-bolder">Grandeur Realty</h3>
-                </a>
+                </div>
                 <div class="ms-2 close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
                     <i class="ti ti-x fs-8"></i>
                 </div>
@@ -44,6 +44,14 @@
                         </a>
                     </li>
                     <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('inquiries') }}" aria-expanded="false">
+                            <span>
+                                <iconify-icon icon="solar:question-circle-bold-duotone" class="fs-6"></iconify-icon>
+                            </span>
+                            <span class="hide-menu">Inquiries</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('contactUs') }}" aria-expanded="false">
                             <span>
                                 <iconify-icon icon="solar:call-chat-bold-duotone" class="fs-6"></iconify-icon>
@@ -75,10 +83,24 @@
             </nav>
         </div>
 
-        <!-- User name at the bottom -->
-        <!-- <div class="text-center p-3 mt-auto bg-light" style="border-top: 1px solid #dee2e6;">
-            <h5 class="mb-0">Logged In As:</h5>
-            <h6 class="text-muted">{{ auth()->user()->name }}</h6>
-        </div> -->
+        @php
+            // Define the path where you want to check the storage (root of your server or Laravel project directory)
+            $path = base_path(); // This gets the path of your Laravel project
+
+            // Get total disk space in GB
+            $storageTotal = round(disk_total_space($path) / 1024 / 1024 / 1024, 2); // Convert from bytes to GB
+
+            // Get free/available disk space in GB
+            $storageFree = round(disk_free_space($path) / 1024 / 1024 / 1024, 2); // Convert from bytes to GB
+
+            // Calculate used storage
+            $storageUsed = $storageTotal - $storageFree;
+        @endphp
+
+        <div class="text-center p-3 mt-auto bg-light" style="border-top: 1px solid #dee2e6;">
+            <h5 class="mb-1">Storage Information:</h5>
+            <h6 class="text-muted mb-0"><span class="text-danger">{{ $storageUsed }}</span> / <span class="text-dark">{{ $storageTotal }}</span> GB Used</h6>
+            <h6 class="text-muted">Free: <span class="text-success">{{ $storageFree }}</span> GB</h6>
+        </div>
     </div>
 </aside>

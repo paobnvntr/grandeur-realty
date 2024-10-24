@@ -41,7 +41,8 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-3">
-                    <h1 class="my-0 site-logo"><a href="{{ route('home') }}">Grandeur Realty</a></h1>
+                    <img class="my-0 site-logo" src="{{ asset('images/grandeur-realty-transparent.png') }}" alt="Grandeur Realty Logo">
+                    <!-- <h1 class="my-0 site-logo"><a href="{{ route('home') }}">Grandeur Realty</a></h1> -->
                 </div>
 
                 @if(Session::has('success'))

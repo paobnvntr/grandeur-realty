@@ -129,40 +129,148 @@
         <div class="col-lg-4 mb-4">
             <div class="card p-4">
                 <h4 class="fw-bold text-center mb-3">Inquiry Form</h4>
-                <form action="#" method="POST">
+                <form action="{{ route('saveInquiry', $property->id) }}" method="POST" id="createInquiryForm">
                     @csrf
+                    <input type="hidden" name="property_name"
+                        value="For {{ ucfirst($property->property_status) }}: {{ $property->size }} ft² {{ ucfirst($property->property_type) }} in {{ $property->city }}">
+
                     <div class="mb-3">
-                        <label for="full_name" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" id="full_name" name="full_name" required>
+                        <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
+                            name="name" required>
+                        @error('name')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="email_address" class="form-label">Email Address</label>
-                        <input type="email" class="form-control" id="email_address" name="email_address" required>
+                        <label for="email" class="form-label">Email Address <span
+                                class="text-danger">*</span></label>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror"
+                            id="email" name="email">
+                        @error('email')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="phone_number" class="form-label">Phone Number</label>
-                        <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
+                        <label for="cellphone_number" class="form-label">Cellphone Number <span
+                                class="text-danger">*</span></label>
+                        <input type="tel" class="form-control @error('cellphone_number') is-invalid @enderror"
+                            id="cellphone_number" name="cellphone_number">
+                        @error('cellphone_number')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="subject" class="form-label">Subject</label>
-                        <select class="form-select" id="subject" name="subject" required>
+                        <label for="subject" class="form-label">Subject <span class="text-danger">*</span></label>
+                        <select class="form-select @error('subject') is-invalid @enderror" id="subject" name="subject">
                             <option value="" selected>Select an inquiry subject</option>
-                            <option value="property_inquiry">Inquiry about Property</option>
-                            <option value="request_viewing">Request for Viewing</option>
-                            <option value="request_information">Request for Information</option>
-                            <option value="negotiation">Negotiation Inquiry</option>
-                            <option value="other">Other</option>
+                            <option value="Inquiry about Property">Inquiry about Property</option>
+                            <option value="Request for Viewing">Request for Viewing</option>
+                            <option value="Request for Information">Request for Information</option>
+                            <option value="Negotiation Inquiry">Negotiation Inquiry</option>
+                            <option value="Other">Other</option>
                         </select>
+                        @error('subject')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="inquiry_message" class="form-label">Message</label>
-                        <textarea class="form-control" id="inquiry_message" name="inquiry_message" rows="4"
-                            required></textarea>
+                        <label for="message" class="form-label">Message <span
+                                class="text-danger">*</span></label>
+                        <textarea class="form-control @error('message') is-invalid @enderror"
+                            id="message" name="message" rows="4"></textarea>
+                        @error('message')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+
+                    <div class="form-group form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="termsCheckbox" name="termsCheckbox">
+                        <label class="form-check-label" for="termsCheckbox">I have read and agree to the <span
+                                data-bs-toggle="modal" data-bs-target="#termsModal" id="termsAndConditionSpan"
+                                class="text-decoration-underline">Terms and
+                                Conditions</span> of Grandeur Realty.</label>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" id="createInquiryBtn">Submit Inquiry</button>
+                    </div>
                 </form>
             </div>
+
+            @include('landing-page.termsAndConditions')
         </div>
     </div>
 </div>
+
+<script>
+    const createInquiryBtn = document.getElementById('createInquiryBtn');
+
+    createInquiryBtn.addEventListener("click", async () => {
+        createInquiryBtn.disabled = true;
+        let dots = 3;
+        createInquiryBtn.textContent = 'Sending . . .';
+
+        const interval = setInterval(() => {
+            if (dots < 3) {
+                dots++;
+            } else {
+                dots = 1;
+            }
+            createInquiryBtn.textContent = `Sending ${' . '.repeat(dots)}`;
+        }, 500);
+
+        const createInquiryForm = document.getElementById('createInquiryForm');
+        const formData = new FormData(createInquiryForm);
+
+        // Remove previous error messages and input highlights
+        const errorElements = document.querySelectorAll('.invalid-feedback');
+        errorElements.forEach(errorElement => {
+            errorElement.remove();
+        });
+
+        const inputElements = document.querySelectorAll('.is-invalid');
+        inputElements.forEach(inputElement => {
+            inputElement.classList.remove('is-invalid');
+        });
+
+        try {
+            const response = await fetch('{{ route('validateSendInquiryForm') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (data.message === 'Validation failed') {
+                createInquiryBtn.disabled = false;
+                clearInterval(interval);
+                createInquiryBtn.textContent = 'Send Inquiry';
+
+                // Show validation errors
+                for (const [key, value] of Object.entries(data.errors)) {
+                    const input = document.querySelector(`[name="${key}"]`);
+                    const error = document.createElement('div');
+                    error.classList.add('invalid-feedback');
+                    error.textContent = value;
+                    input.classList.add('is-invalid');
+                    input.parentNode.insertBefore(error, input.nextSibling);
+                }
+            } else if (data.message === 'Validation passed') {
+                createInquiryForm.submit();
+                console.log('Validation passed');
+            } else {
+                console.log('Other errors');
+            }
+
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    });
+
+</script>
+
 @endsection

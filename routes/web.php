@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InquiriesController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\ListWithUsController;
@@ -19,6 +20,9 @@ Route::controller(LandingPageController::class)->group(function () {
     Route::get('all-properties', 'allProperties')->name('allProperties');
     Route::get('hot-properties/{city}', 'hotProperties')->name('hotProperties');
     Route::get('property-details/{id}', 'propertyDetails')->name('propertyDetails');
+
+    Route::post('validateSendInquiryForm', 'validateSendInquiryForm')->name('validateSendInquiryForm');
+    Route::post('saveInquiry/{id}', 'saveInquiry')->name('saveInquiry');
 
     Route::get('list-with-us', 'listWithUsForm')->name('listWithUsForm');
     Route::post('validateListWithUsForm', 'validateListWithUsForm')->name('validateListWithUsForm');
@@ -56,14 +60,37 @@ Route::middleware('auth')->group(function () {
         Route::get('list-with-us', 'listWithUs')->name('listWithUs');
         Route::post('approveList/{id}', 'approveList')->name('listWithUs.approveList');
         Route::post('disapproveList/{id}', 'disapproveList')->name('listWithUs.disapproveList');
+        Route::post('validateListUpdateForm/{id}', 'validateListUpdateForm')->name('listWithUs.validateListUpdateForm');
+        Route::post('updateList/{id}', 'updateList')->name('listWithUs.updateList');
     });
 
     Route::controller(PropertyController::class)->prefix('properties')->group(function () {
         Route::get('properties', 'properties')->name('properties.List');
+        Route::get('add-properties', 'addProperties')->name('properties.addProperties');
+        Route::post('validateAddPropertiesForm', 'validateAddPropertiesForm')->name('properties.validateAddPropertiesForm');
+        Route::post('saveProperties', 'saveProperties')->name('properties.saveProperties');
         Route::get('sold-properties', 'soldProperties')->name('properties.soldProperties');
         Route::post('markAsSold/{id}', 'markAsSold')->name('properties.markAsSold');
         Route::post('markAsAvailable/{id}', 'markAsAvailable')->name('properties.markAsAvailable');
         Route::post('delete/{id}', 'delete')->name('properties.delete');
+
+        Route::get('settings', 'settings')->name('properties.settings');
+
+        Route::get('edit-hot-properties-images', 'editHotPropertiesImages')->name('properties.editHotPropertiesImages');
+        Route::post('validateEditHotPropertiesImagesForm', 'validateEditHotPropertiesImagesForm')->name('properties.validateEditHotPropertiesImagesForm');
+        Route::post('saveEditHotPropertiesImages/{id}', 'saveEditHotPropertiesImages')->name('properties.saveEditHotPropertiesImages');
+        
+        Route::get('edit-properties-features', 'editPropertiesFeatures')->name('properties.editPropertiesFeatures');
+        Route::post('validateEditPropertiesFeaturesForm', 'validateEditPropertiesFeaturesForm')->name('properties.validateEditPropertiesFeaturesForm');
+        Route::post('saveEditPropertiesFeatures/{id}', 'saveEditPropertiesFeatures')->name('properties.saveEditPropertiesFeatures');
+
+        Route::post('validatePropertiesUpdateForm/{id}', 'validatePropertiesUpdateForm')->name('properties.validatePropertiesUpdateForm');
+        Route::post('updateProperties/{id}', 'updateProperties')->name('properties.updateProperties');
+    });
+
+    Route::controller(InquiriesController::class)->prefix('inquiries')->group(function () {
+        Route::get('inquiries', 'inquiries')->name('inquiries');
+        Route::delete('deleteInquiry/{id}', 'deleteInquiry')->name('inquiries.deleteInquiry');
     });
 
     Route::controller(ContactUsController::class)->prefix('contactUs')->group(function () {

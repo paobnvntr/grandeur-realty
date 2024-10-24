@@ -12,7 +12,7 @@
                 <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="200">
                     <ol class="breadcrumb text-center justify-content-center">
                         <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                        <li class="breadcrumb-item active text-white-50" aria-current="page" style="cursor: default;">
+                        <li class="breadcrumb-item active" aria-current="page" style="cursor: default;">
                             Contact
                         </li>
                     </ol>
@@ -61,11 +61,20 @@
                     id="createContactUsForm">
                     @csrf
                     <div class="row">
-                        <div class="col-6 mb-3">
+                        <div class="col-12 mb-3">
                             <label for="name" class="form-label">Your Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
                                 name="name">
                             @error('name')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label for="cell" class="form-label">Cellphone Number <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="cell" name="cellphone_number"
+                                class="form-control @error('cell') is-invalid @enderror" required />
+                            @error('cell')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
@@ -94,12 +103,20 @@
                             @enderror
                         </div>
 
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="termsCheckbox" name="termsCheckbox">
+                            <label class="form-check-label" for="termsCheckbox">I have read and agree to the <span
+                                    data-bs-toggle="modal" data-bs-target="#termsModal" id="termsAndConditionSpan" class="text-decoration-underline">Terms and
+                                    Conditions</span> of Grandeur Realty.</label>
+                        </div>
+
                         <div class="col-12 d-flex justify-content-end">
                             <button type="button" class="btn btn-primary" id="createContactUsBtn">Send Message</button>
                         </div>
                     </div>
                 </form>
             </div>
+            @include('landing-page.termsAndConditions')
         </div>
     </div>
 </div>

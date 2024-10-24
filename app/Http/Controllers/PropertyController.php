@@ -2,25 +2,121 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PropertiesFeature;
 use App\Models\Property;
+use App\Models\HotPropertiesImage;
 use App\Models\Log;
+use App\Models\ListingAnalytics;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
 
 class PropertyController extends Controller
 {
     public function properties()
     {
         $properties = Property::where('status', 'available')
-            ->orderBy('created_at', 'ASC')
-            ->paginate(5);
+            ->orderBy('created_at', 'DESC')
+            ->paginate(4);
+
         return view('admin.properties.index', compact('properties'));
+    }
+
+    public function addProperties()
+    {
+        return view('admin.properties.addProperties');
+    }
+
+    public function validateAddPropertiesForm(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            '_token' => 'required',
+            'user_type' => 'required',
+            'name' => 'required',
+            'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
+            'property_type' => 'required',
+            'city' => 'required',
+            'address' => 'required',
+            'size' => 'required',
+            'property_status' => 'required',
+            'price' => 'required',
+
+            'image' => 'required|array',
+            'image.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+        ], [
+            'image.required' => 'Please upload at least one image.',
+            'image.*.image' => 'The uploaded file must be an image.',
+            'image.*.mimes' => 'The uploaded image must be a type of: jpeg, png, jpg',
+            'image.*.max' => 'The uploaded image must not be greater than 2MB.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
+        } else {
+            return response()->json(['message' => 'Validation passed']);
+        }
+    }
+
+    public function saveProperties(Request $request)
+    {
+        $image = [];
+        if ($request->hasFile('image')) {
+            // Create a folder name using the current timestamp and the trimmed request name
+            $folderName = time() . '_' . trim($request->name);
+            $propertyFolder = public_path("uploads/property/{$folderName}");
+
+            // Create the new directory
+            mkdir($propertyFolder, 0755, true);
+
+            foreach ($request->file('image') as $file) {
+                $originalName = $file->getClientOriginalName();
+                $safeFileName = str_replace([' ', ','], '_', $originalName);
+
+                $fileName = time() . '_' . $safeFileName; // Create the new filename
+                $file->move($propertyFolder, $fileName); // Move the file to the unique folder
+                $image[] = $fileName;
+            }
+        } else {
+            \Log::info('No files received.');
+        }
+
+        $propertyData = [
+            'user_type' => trim($request->user_type),
+            'name' => trim($request->name),
+            'cellphone_number' => trim($request->cellphone_number),
+            'email' => trim($request->email),
+            'property_type' => trim($request->property_type),
+            'city' => trim($request->city),
+            'address' => trim($request->address),
+            'size' => trim($request->size),
+            'property_status' => trim($request->property_status),
+            'price' => trim($request->price),
+            'bedrooms' => trim($request->bedrooms),
+            'bathrooms' => trim($request->bathrooms),
+            'garage' => trim($request->garage),
+            'description' => trim($request->description),
+            'folder_name' => $folderName,
+            'image' => json_encode($image),
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ];
+
+        $createProperty = Property::create($propertyData);
+
+        if ($createProperty) {
+            return redirect()->route('properties.List')->with('success', 'Property added successfully!');
+        } else {
+            return redirect()->route('properties.List')->with('error', 'Failed to add property!');
+        }
     }
 
     public function soldProperties()
     {
         $properties = Property::where('status', 'sold')
-            ->orderBy('created_at', 'ASC')
+            ->orderBy('created_at', 'DESC')
             ->paginate(5);
         return view('admin.properties.soldProperties', compact('properties'));
     }
@@ -186,6 +282,290 @@ class PropertyController extends Controller
             'user' => $userName,
             'subject' => 'Property Deletion Failed',
             'message' => "$userName attempted to delete a non-existing property ID: $propertyId.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+    }
+
+    public function settings()
+    {
+        return view('admin.properties.settingsProperties');
+    }
+
+    public function editHotPropertiesImages()
+    {
+        $defaultImages = [
+            '../images/hero_bg_3.jpg',
+            '../images/hero_bg_2.jpg',
+            '../images/hero_bg_1.jpg'
+        ];
+
+        $cities = Property::select('city')
+            ->where('status', 'available')
+            ->selectRaw('count(*) as property_count')
+            ->groupBy('city')
+            ->orderBy('property_count', 'desc')
+            ->limit(6)
+            ->get();
+
+        $cityImages = HotPropertiesImage::whereIn('hot_properties_name', $cities->pluck('city'))->get()->keyBy('hot_properties_name');
+
+        foreach ($cities as $city) {
+            // Check if the city has an associated image
+            if ($cityImages->has($city->city)) {
+                // Use the image from the hot_properties_images table
+                $city->image_url = asset('uploads/hot_properties/' . $cityImages->get($city->city)->image);
+            } else {
+                // Randomly select a default image
+                $city->image_url = $defaultImages[array_rand($defaultImages)];
+            }
+        }
+
+        return view('admin.properties.imagesHotProperties', compact('cities'));
+    }
+
+    public function validateEditHotPropertiesImagesForm(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            '_token' => 'required',
+            'city' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
+        } else {
+            return response()->json(['message' => 'Validation passed']);
+        }
+    }
+
+    public function saveEditHotPropertiesImages(Request $request, $city)
+    {
+        // Retrieve the hot properties image record for the given city
+        $hotPropertiesImage = HotPropertiesImage::where('hot_properties_name', $city)->first();
+
+        // Check if the hot properties image exists
+        if ($hotPropertiesImage) {
+            // Delete the existing image file if it exists
+            if (file_exists(public_path('uploads/hot_properties/' . $hotPropertiesImage->image))) {
+                unlink(public_path('uploads/hot_properties/' . $hotPropertiesImage->image)); // Delete the old image
+            }
+
+            // Update the record with the new image
+            $hotPropertiesImage->update([
+                'image' => $this->uploadHotPropertiesImage($request, $city),
+                'updated_at' => now('Asia/Manila'),
+            ]);
+        } else {
+            // Create a new record if it does not exist
+            HotPropertiesImage::create([
+                'hot_properties_name' => $city,
+                'image' => $this->uploadHotPropertiesImage($request, $city),
+                'created_at' => now('Asia/Manila'),
+                'updated_at' => now('Asia/Manila'),
+            ]);
+        }
+
+        return redirect()->route('properties.editHotPropertiesImages')->with('success', 'Hot Properties Image Updated Successfully!');
+    }
+
+    private function uploadHotPropertiesImage($request, $city)
+    {
+        $image = $request->file('image');
+        // Generate a filename using the city name and current timestamp
+        $fileName = strtolower(str_replace([' ', ','], '_', $city)) . '_' . time() . '.' . $image->getClientOriginalExtension(); // Create the new filename
+
+        $image->move(public_path('uploads/hot_properties'), $fileName); // Move the file to the unique folder
+
+        return $fileName;
+    }
+
+    public function editPropertiesFeatures()
+    {
+        $features = PropertiesFeature::all();
+        $icons = [
+            'flaticon-house',
+            'flaticon-building',
+            'flaticon-house-2',
+            'flaticon-house-1',
+            'flaticon-house-3',
+            'flaticon-house-4',
+            'flaticon-house-5',
+        ];
+
+        return view('admin.properties.featureProperties', compact('features', 'icons'));
+    }
+
+    public function validateEditPropertiesFeaturesForm(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            '_token' => 'required',
+            'icon' => 'required',
+            'title' => 'required',
+            'description' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
+        } else {
+            return response()->json(['message' => 'Validation passed']);
+        }
+    }
+
+    public function saveEditPropertiesFeatures(Request $request, $id)
+    {
+        $feature = PropertiesFeature::findOrFail($id);
+
+        if ($this->shouldUpdateFeatureDetails($feature, $request)) {
+            $this->updateFeatureDetails($feature, $request);
+
+            $this->logUpdateFeature($feature, Auth::user()->username);
+
+            return redirect()->route('properties.editPropertiesFeatures')->with('success', 'Feature Updated Successfully!');
+        } else {
+            return redirect()->route('properties.editPropertiesFeatures')->with('failed', 'Please Edit a Field!');
+        }
+    }
+
+    private function shouldUpdateFeatureDetails($feature, Request $request)
+    {
+        return (
+            $request->input('icon') !== $feature->icon ||
+            $request->input('title') !== $feature->title ||
+            $request->input('description') !== $feature->description
+        );
+    }
+
+    private function updateFeatureDetails($feature, Request $request)
+    {
+        $feature->icon = trim($request->icon);
+        $feature->title = trim($request->title);
+        $feature->description = trim($request->description);
+        $feature->updated_at = now('Asia/Manila');
+        $feature->save();
+    }
+
+    private function logUpdateFeature($feature, $username)
+    {
+        $logType = 'Edit Property Feature';
+        $logUser = $username;
+
+        if ($feature->wasChanged()) {
+            $logSubject = 'Edit Property Feature Success';
+            $logMessage = "$logUser has successfully updated the feature: $feature->title.";
+        } else {
+            $logSubject = 'Edit Property Feature Failed';
+            $logMessage = "$logUser attempted to update the feature: $feature->title, but no changes were made.";
+        }
+
+        Log::create([
+            'type' => $logType,
+            'user' => $logUser,
+            'subject' => $logSubject,
+            'message' => $logMessage,
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+    }
+
+    public function validatePropertiesUpdateForm(Request $request, $id)
+    {
+        $properties = Property::findOrFail($id);
+
+        if (
+            trim(strtolower($request->user_type)) === trim(strtolower($properties->user_type)) &&
+            $request->name === $properties->name &&
+            $request->cellphone_number === $properties->cellphone_number &&
+            $request->email === $properties->email &&
+            trim(strtolower($request->property_type)) === trim(strtolower($properties->property_type)) &&
+            $request->city === $properties->city &&
+            $request->address === $properties->address &&
+            $request->size === $properties->size &&
+            trim(strtolower($request->property_status)) === trim(strtolower($properties->property_status)) &&
+            $request->price === $properties->price &&
+            $request->bedrooms === $properties->bedrooms &&
+            $request->bathrooms === $properties->bathrooms &&
+            $request->garage === $properties->garage &&
+            $request->description === $properties->description
+        ) {
+            return response()->json(['message' => 'No changes detected']);
+        } else {
+            $validator = Validator::make($request->all(), [
+                '_token' => 'required',
+                'user_type' => 'required',
+                'name' => 'required',
+                'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i',
+                'email' => 'required|email|regex:/^.+@.+\..+$/i',
+                'property_type' => 'required',
+                'city' => 'required',
+                'address' => 'required',
+                'size' => 'required',
+                'property_status' => 'required',
+                'price' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
+            } else {
+                return response()->json(['message' => 'Validation passed']);
+            }
+        }
+    }
+
+    public function updateProperties(Request $request, $id)
+    {
+        $properties = Property::findOrFail($id);
+
+        $properties->update([
+            'user_type' => trim($request->user_type),
+            'name' => trim($request->name),
+            'cellphone_number' => trim($request->cellphone_number),
+            'email' => trim($request->email),
+            'property_type' => trim($request->property_type),
+            'city' => trim($request->city),
+            'address' => trim($request->address),
+            'size' => trim($request->size),
+            'property_status' => trim($request->property_status),
+            'price' => trim($request->price),
+            'bedrooms' => trim($request->bedrooms) ?: 0,
+            'bathrooms' => trim($request->bathrooms) ?: 0,
+            'garage' => trim($request->garage) ?: 0,
+            'description' => trim($request->description),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+
+        $user = Auth::user()->username;
+
+        if ($properties->save()) {
+            $this->logUpdatePropertiesSuccess($user, $properties->id);
+
+            session()->flash('success', 'Property updated successfully!');
+            return response()->json(['message' => 'Property updated successfully.']);
+        } else {
+            $this->logUpdatePropertiesFailed($user, $properties->id);
+
+            return response()->json(['message' => 'Failed to update property.']);
+        }
+    }
+
+    private function logUpdatePropertiesSuccess($user, $propertyId)
+    {
+        Log::create([
+            'type' => 'Update Properties',
+            'user' => $user,
+            'subject' => 'Update Properties Details Success',
+            'message' => "$user has successfully updated the property with ID $propertyId.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+    }
+    private function logUpdatePropertiesFailed($user, $propertyId)
+    {
+        Log::create([
+            'type' => 'Update Properties',
+            'user' => $user,
+            'subject' => 'Update Properties Details Failed',
+            'message' => "$user failed to update the property with ID $propertyId.",
             'created_at' => now('Asia/Manila'),
             'updated_at' => now('Asia/Manila'),
         ]);

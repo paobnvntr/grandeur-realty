@@ -25,6 +25,7 @@
                                 <tr class="border-2 border-bottom border-primary border-0">
                                     <th scope="col" class="ps-0 sticky-column-left">No.</th>
                                     <th scope="col" class="ps-0">Name</th>
+                                    <th scope="col">Cellphone Number</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Subject</th>
                                     <th scope="col">Message</th>
@@ -40,12 +41,14 @@
                                                 {{ $loop->iteration + ($contacts->currentPage() - 1) * $contacts->perPage() }}
                                             </th>
                                             <td>{{ $contact->name }}</td>
+                                            <td>{{ $contact->cellphone_number }}</td>
                                             <td>{{ $contact->email }}</td>
                                             <td>{{ $contact->subject }}</td>
-                                            <td><a class="fw-medium d-block link-info userUsername" data-bs-toggle="modal"
+                                            <td>
+                                                <a class="fw-medium d-block link-info userUsername" data-bs-toggle="modal"
                                                     data-bs-target="#messageModal{{ $contact->id }}">
-                                                    {{ Str::limit($contact->message, 30) }}
-                                                </a></td>
+                                                    {{ Str::limit($contact->message, 30) }}</a>
+                                            </td>
                                             <td>{{ $contact->created_at->format('M d, Y') }}</td>
                                             <td class="text-center sticky-column-right">
                                                 <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
@@ -58,7 +61,7 @@
                                     @endforeach
                                 @else
                                     <tr>
-                                        <td colspan="7" class="text-center">No contact inquiries found.</td>
+                                        <td colspan="8" class="text-center">No contact inquiries found.</td>
                                     </tr>
                                 @endif
                             </tbody>

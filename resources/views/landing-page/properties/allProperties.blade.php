@@ -26,7 +26,7 @@
     <div class="container">
         <div class="row mb-5 align-items-center">
             <div class="col-lg-6">
-                <h2 class="font-weight-bold text-primary heading">
+                <h2 class="fw-bold text-primary heading">
                     Hot Properties
                 </h2>
             </div>
@@ -34,10 +34,14 @@
 
         <div class="container mt-5">
             <div class="row button-row">
-                @foreach($hotCities as $city)
-                    <div class="col-md-2 mb-3">
-                        <a href="{{ route('hotProperties', ['city' => $city->city]) }}"
-                            class="button-card">{{ $city->city }}</a>
+                @foreach($cities as $city)
+                    <div class="col-6 mb-3">
+                        <a href="{{ route('hotProperties', ['city' => $city->city]) }}" class="city-card"
+                            style="background-image: url('{{ $city->image_url }}');">
+                            <div class="city-overlay">
+                                <span class="city-name">{{ $city->city }}</span>
+                            </div>
+                        </a>
                     </div>
                 @endforeach
             </div>
@@ -305,8 +309,8 @@
 
                 // Match the location
                 const matchesLocation = location
-                    ? (property.city.toLowerCase().includes(location.toLowerCase()) || 
-                    property.address.toLowerCase().includes(location.toLowerCase()))
+                    ? (property.city.toLowerCase().includes(location.toLowerCase()) ||
+                        property.address.toLowerCase().includes(location.toLowerCase()))
                     : true;
 
                 // Match the type

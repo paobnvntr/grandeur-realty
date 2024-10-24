@@ -27,17 +27,17 @@
                         <table class="table text-nowrap align-middle mb-0">
                             <thead>
                                 <tr class="border-2 border-bottom border-primary border-0">
-                                    <th scope="col" class="ps-0">No.</th>
+                                    <th scope="col" class="ps-0 sticky-column-left">No.</th>
                                     <th scope="col" class="ps-0">Username</th>
                                     <th scope="col">Role</th>
-                                    <th scope="col" class="text-center">Action</th>
+                                    <th scope="col" class="text-center sticky-column-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="table-group-divider">
                                 @if($users->count() > 0)
                                     @foreach($users as $user)
                                         <tr>
-                                            <th class="align-middle text-center">
+                                            <th class="align-middle text-center sticky-column-left">
                                                 {{ $loop->iteration + ($users->currentPage() - 1) * $users->perPage() }}
                                             </th>
                                             <td>
@@ -49,7 +49,7 @@
                                             <td scope="row" class="ps-0 fw-medium">
                                                 <span class="table-link1 text-truncate d-block">{{ $user->level }}</span>
                                             </td>
-                                            <td class="text-center fw-medium">
+                                            <td class="text-center fw-medium sticky-column-right">
                                                 @if (auth()->user()->level == 'Super Admin')
                                                     <a href="{{ route('users.editUser', $user->id) }}"
                                                         class="btn btn-sm btn-warning">Edit</a>

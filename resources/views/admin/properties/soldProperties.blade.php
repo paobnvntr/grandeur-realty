@@ -32,12 +32,12 @@
                         <table class="table text-nowrap align-middle mb-0">
                             <thead>
                                 <tr class="border-2 border-bottom border-primary border-0">
-                                    <th scope="col" class="ps-0">No.</th>
+                                    <th scope="col" class="ps-0 sticky-column-left">No.</th>
                                     <th scope="col">Client Name</th>
                                     <th scope="col">Property Type</th>
                                     <th scope="col">City</th>
                                     <th scope="col">Date Sold</th>
-                                    <th scope="col" class="text-end">Action</th>
+                                    <th scope="col" class="text-end sticky-column-right">Action</th>
                                 </tr>
                             </thead>
 
@@ -45,12 +45,12 @@
                                 @if($properties->count() > 0)
                                     @foreach($properties as $index => $property)
                                         <tr>
-                                            <td class="ps-0">{{ $index + 1 }}</td>
+                                            <td class="ps-0 sticky-column-left">{{ $index + 1 }}</td>
                                             <td>{{ \Illuminate\Support\Str::title($property->name) }}</td>
                                             <td>{{ ucfirst($property->property_type) }}</td>
                                             <td>{{ ucfirst($property->city) }}</td>
                                             <td>{{ \Carbon\Carbon::parse($property->date_sold)->format('Y-m-d') }}</td>
-                                            <td class="text-end">
+                                            <td class="text-end sticky-column-right">
                                                 <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
                                                     data-bs-target="#detailsModal-{{ $property->id }}">
                                                     View Details

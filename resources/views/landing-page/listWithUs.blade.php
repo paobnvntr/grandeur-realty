@@ -213,6 +213,13 @@
                             <div id="imagePreview" class="row mt-3"></div>
                         </div>
 
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="termsCheckbox" name="termsCheckbox">
+                            <label class="form-check-label" for="termsCheckbox">I have read and agree to the <span
+                                    data-bs-toggle="modal" data-bs-target="#termsModal" id="termsAndConditionSpan" class="text-decoration-underline">Terms and
+                                    Conditions</span> of Grandeur Realty.</label>
+                        </div>
+
                         <div class="col-12 d-flex justify-content-end">
                             <button type="button" class="btn btn-primary" id="createListWithUsBtn">Submit
                                 Listing</button>
@@ -221,6 +228,7 @@
                 </form>
             </div>
             @include('landing-page.imagePreview')
+            @include('landing-page.termsAndConditions')
         </div>
     </div>
 </div>
@@ -338,7 +346,7 @@
 
         uploadedImages.forEach((fileObject, index) => {
             const col = document.createElement('div');
-            col.classList.add('col-md-3', 'mb-3', 'position-relative');
+            col.classList.add('col-md-3', 'mb-3', 'text-center', 'position-relative');
 
             const img = document.createElement('img');
             img.src = fileObject.data;

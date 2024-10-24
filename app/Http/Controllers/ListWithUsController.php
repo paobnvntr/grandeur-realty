@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Log;
 use App\Models\Property;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ListWithUsController extends Controller
 {
@@ -45,21 +46,21 @@ class ListWithUsController extends Controller
         try {
             $oldFolderPath = public_path("uploads/list-with-us/{$listing->folder_name}");
             $newFolderPath = public_path("uploads/property/{$listing->folder_name}");
-    
+
             if (!file_exists($newFolderPath)) {
                 mkdir($newFolderPath, 0755, true);
             }
-    
+
             $images = json_decode($listing->image);
             foreach ($images as $image) {
                 $oldImagePath = "{$oldFolderPath}/{$image}";
                 $newImagePath = "{$newFolderPath}/{$image}";
-    
+
                 if (file_exists($oldImagePath)) {
                     copy($oldImagePath, $newImagePath);
                 }
             }
-            
+
             Property::create($propertyData);
 
             $this->logApprovalSuccess(Auth::user()->username);
@@ -179,4 +180,108 @@ class ListWithUsController extends Controller
         ]);
     }
 
+    public function validateListUpdateForm(Request $request, $id)
+    {
+        $listing = ListWithUs::findOrFail($id);
+
+        if (
+            trim(strtolower($request->user_type)) === trim(strtolower($listing->user_type)) &&
+            $request->name === $listing->name &&
+            $request->cellphone_number === $listing->cellphone_number &&
+            $request->email === $listing->email &&
+            trim(strtolower($request->property_type)) === trim(strtolower($listing->property_type)) &&
+            $request->city === $listing->city &&
+            $request->address === $listing->address &&
+            $request->size === $listing->size &&
+            trim(strtolower($request->property_status)) === trim(strtolower($listing->property_status)) &&
+            $request->price === $listing->price &&
+            $request->bedrooms === $listing->bedrooms &&
+            $request->bathrooms === $listing->bathrooms &&
+            $request->garage === $listing->garage &&
+            $request->description === $listing->description
+        ) {
+            return response()->json(['message' => 'No changes detected']);
+        } else {
+            $validator = Validator::make($request->all(), [
+                '_token' => 'required',
+                'user_type' => 'required',
+                'name' => 'required',
+                'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i',
+                'email' => 'required|email|regex:/^.+@.+\..+$/i',
+                'property_type' => 'required',
+                'city' => 'required',
+                'address' => 'required',
+                'size' => 'required',
+                'property_status' => 'required',
+                'price' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
+            } else {
+                return response()->json(['message' => 'Validation passed']);
+            }
+        }
+    }
+
+    public function updateList(Request $request, $id)
+    {
+        // Find the listing by ID
+        $listing = ListWithUs::findOrFail($id);
+
+        // Only update the fields related to details (excluding images)
+        $listing->update([
+            'user_type' => trim($request->user_type),
+            'name' => trim($request->name),
+            'cellphone_number' => trim($request->cellphone_number),
+            'email' => trim($request->email),
+            'property_type' => trim($request->property_type),
+            'city' => trim($request->city),
+            'address' => trim($request->address),
+            'size' => trim($request->size),
+            'property_status' => trim($request->property_status),
+            'price' => trim($request->price),
+            'bedrooms' => trim($request->bedrooms) ?: 0,
+            'bathrooms' => trim($request->bathrooms) ?: 0,
+            'garage' => trim($request->garage) ?: 0,
+            'description' => trim($request->description),
+            'updated_at' => now('Asia/Manila'), // Update the timestamp
+        ]);
+
+        $user = Auth::user()->username;
+
+        if ($listing->save()) {
+            $this->logUpdateListSuccess($user, $listing->id);
+
+            session()->flash('success', 'Listing updated successfully!');
+            return response()->json(['message' => 'Listing updated successfully.']);
+        } else {
+            $this->logUpdateListFailed($user, $listing->id);
+
+            return response()->json(['message' => 'Failed to update listing.']);
+        }
+    }
+
+    private function logUpdateListSuccess($user, $listingId)
+    {
+        Log::create([
+            'type' => 'Update Listing',
+            'user' => $user,
+            'subject' => 'Update Listing Details Success',
+            'message' => "$user has successfully updated the listing with ID $listingId.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+    }
+    private function logUpdateListFailed($user, $listingId)
+    {
+        Log::create([
+            'type' => 'Update Listing',
+            'user' => $user,
+            'subject' => 'Update Listing Details Failed',
+            'message' => "$user failed to update the listing with ID $listingId.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+    }
 }

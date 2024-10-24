@@ -6,6 +6,7 @@ use App\Models\Log;
 use App\Models\Property;
 use App\Models\ListWithUs;
 use App\Models\ContactUs;
+use App\Models\ListingAnalytics;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -43,18 +44,40 @@ class DashboardController extends Controller
         $totalForCalculation = $listWithUsRequests + $availableProperties + $soldProperties;
 
         if ($totalForCalculation > 0) {
-            $listWithUsRequests = ($listWithUsRequests / $totalForCalculation) * 100;
-            $availableProperties = ($availableProperties / $totalForCalculation) * 100;
-            $soldProperties = ($soldProperties / $totalForCalculation) * 100;
+            $listWithUsRequestsPercentage = ($listWithUsRequests / $totalForCalculation) * 100;
+            $availablePropertiesPercentage = ($availableProperties / $totalForCalculation) * 100;
+            $soldPropertiesPercentage = ($soldProperties / $totalForCalculation) * 100;
         } else {
-            $listWithUsRequests = 0;
-            $availableProperties = 0;
-            $soldProperties = 0;
+            $listWithUsRequestsPercentage = 0;
+            $availablePropertiesPercentage = 0;
+            $soldPropertiesPercentage = 0;
         }
 
         $contactUsMessages = ContactUs::count();
+
         $logs = Log::orderBy('created_at', 'DESC')->limit(5)->get();
 
-        return view('admin.dashboard', compact('logs', 'listWithUsRequests', 'availableProperties', 'soldProperties', 'contactUsMessages', 'lastYearSoldData', 'thisYearSoldData'));
+        $totalViews = ListingAnalytics::sum('views');
+        $totalInteractions = ListingAnalytics::sum('interactions');
+
+        // Calculate total
+        $total = $totalViews + $totalInteractions;
+
+        // Calculate percentages
+        $percentageViews = $total > 0 ? ($totalViews / $total) * 100 : 0;
+        $percentageInteractions = $total > 0 ? ($totalInteractions / $total) * 100 : 0;
+
+        // Round percentages to avoid decimal values if necessary
+        $percentageViews = round($percentageViews, 2);
+        $percentageInteractions = round($percentageInteractions, 2);
+
+        // Ensure total percentage equals 100
+        $percentageTotal = $percentageViews + $percentageInteractions;
+        if ($percentageTotal < 100) {
+            // Adjust one of the percentages to make total exactly 100
+            $percentageViews += (100 - $percentageTotal);
+        }
+
+        return view('admin.dashboard', compact('logs', 'listWithUsRequests', 'availableProperties', 'soldProperties', 'contactUsMessages', 'lastYearSoldData', 'thisYearSoldData', 'percentageViews', 'percentageInteractions', 'totalViews', 'totalInteractions', 'listWithUsRequestsPercentage', 'availablePropertiesPercentage', 'soldPropertiesPercentage'));
     }
 }

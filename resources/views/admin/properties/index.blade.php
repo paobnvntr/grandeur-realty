@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('contents')
-<div class="container-fluid">
+<div class="container-fluid pb-0">
     @if(Session::has('success'))
         <div class="alert alert-success" id="alert-success" role="alert">
             {{ Session::get('success') }}
@@ -14,13 +14,18 @@
         </div>
     @endif
 
-    <!-- <div class="p-2">
+    <div class="p-2">
         <div class="d-flex justify-content-end align-items-center">
-            <a href="" class="text-dark">
-                <iconify-icon icon="solar:settings-line-duotone" class="fs-6 me-2"></iconify-icon>
+            <a href="{{ route('properties.soldProperties') }}" class="btn btn-success btn-sm me-2">
+                Sold Properties
+            </a>
+
+            <a href="{{ route('properties.settings') }}" class="btn btn-sm btn-light d-flex align-items-center">
+                <iconify-icon icon="solar:settings-line-duotone" class="fs-6 me-1"></iconify-icon>
+                Properties Settings
             </a>
         </div>
-    </div> -->
+    </div>
 
     <div class="row">
         <div class="col-lg-12">
@@ -33,8 +38,8 @@
                         </div>
 
                         <div class="d-flex align-items-center justify-content-end">
-                            <a href="{{ route('properties.soldProperties') }}" class="btn btn-dark btn-sm">
-                                Sold Properties
+                            <a href="{{ route('properties.addProperties') }}" class="btn btn-dark btn-sm">
+                                Add Properties
                             </a>
                         </div>
                     </div>
@@ -43,12 +48,11 @@
                         <table class="table text-nowrap align-middle mb-0">
                             <thead>
                                 <tr class="border-2 border-bottom border-primary border-0">
-                                    <th scope="col" class="ps-0">No.</th>
+                                    <th scope="col" class="ps-0 sticky-column-left">No.</th>
+                                    <th scope="col">Property Name</th>
                                     <th scope="col">Client Name</th>
-                                    <th scope="col">Property Type</th>
-                                    <th scope="col">City</th>
                                     <th scope="col">Date Approved</th>
-                                    <th scope="col" class="text-end">Action</th>
+                                    <th scope="col" class="text-end sticky-column-right">Action</th>
                                 </tr>
                             </thead>
 
@@ -56,12 +60,12 @@
                                 @if($properties->count() > 0)
                                     @foreach($properties as $index => $property)
                                         <tr>
-                                            <td class="ps-0">{{ $index + 1 }}</td>
+                                            <td class="ps-0 sticky-column-left">{{ $index + 1 }}</td>
+                                            <td>For {{ ucfirst($property->property_status) }}: {{ $property->size }} ft²
+                                                {{ ucfirst($property->property_type) }} in {{ $property->city }}</td>
                                             <td>{{ \Illuminate\Support\Str::title($property->name) }}</td>
-                                            <td>{{ ucfirst($property->property_type) }}</td>
-                                            <td>{{ ucfirst($property->city) }}</td>
                                             <td>{{ $property->created_at->format('Y-m-d') }}</td>
-                                            <td class="text-end">
+                                            <td class="text-end sticky-column-right">
                                                 <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
                                                     data-bs-target="#detailsModal-{{ $property->id }}">
                                                     View Details

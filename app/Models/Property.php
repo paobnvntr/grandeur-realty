@@ -9,7 +9,7 @@ class Property extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ 
+    protected $fillable = [
         'user_type',
         'name',
         'cellphone_number',
@@ -31,4 +31,9 @@ class Property extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function analytics()
+    {
+        return $this->hasOne(ListingAnalytics::class, 'property_id');
+    }
 }
