@@ -25,6 +25,7 @@ class LandingPageController extends Controller
 
         $cities = Property::select('city')
             ->where('status', 'available')
+            ->where('image', '!=', '[]')
             ->selectRaw('count(*) as property_count')
             ->groupBy('city')
             ->orderBy('property_count', 'desc')
@@ -53,6 +54,7 @@ class LandingPageController extends Controller
     {
         // Get all properties without pagination
         $allProperties = Property::where('status', 'available')
+            ->where('image', '!=', '[]')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -64,6 +66,7 @@ class LandingPageController extends Controller
 
         $cities = Property::select('city')
             ->where('status', 'available')
+            ->where('image', '!=', '[]')
             ->selectRaw('count(*) as property_count')
             ->groupBy('city')
             ->orderBy('property_count', 'desc')
@@ -90,6 +93,7 @@ class LandingPageController extends Controller
     {
         $hotProperties = Property::where('city', $city)
             ->where('status', 'available')
+            ->where('image', '!=', '[]')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -133,7 +137,7 @@ class LandingPageController extends Controller
             '_token' => 'required',
             'property_name' => 'required',
             'name' => 'required',
-            'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i',
+            'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i|numeric',
             'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'subject' => 'required',
             'message' => 'required',
@@ -190,14 +194,17 @@ class LandingPageController extends Controller
             '_token' => 'required',
             'user_type' => 'required',
             'name' => 'required',
-            'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i',
+            'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i|numeric',
             'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'property_type' => 'required',
             'city' => 'required',
             'address' => 'required',
-            'size' => 'required',
+            'size' => 'required|numeric',
             'property_status' => 'required',
-            'price' => 'required',
+            'price' => 'required|numeric',
+            'bedrooms' => 'numeric',
+            'bathrooms' => 'numeric',
+            'garage' => 'numeric',
 
             'image' => 'required|array',
             'image.*' => 'image|mimes:jpeg,png,jpg|max:2048',
@@ -292,7 +299,7 @@ class LandingPageController extends Controller
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
             'name' => 'required',
-            'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i',
+            'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i|numeric',
             'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'subject' => 'required',
             'message' => 'required',

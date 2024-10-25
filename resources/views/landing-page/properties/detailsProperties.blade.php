@@ -143,18 +143,17 @@
                         @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email Address <span
-                                class="text-danger">*</span></label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror"
-                            id="email" name="email">
+                        <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                            name="email">
                         @error('email')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="mb-3">
                         <label for="cellphone_number" class="form-label">Cellphone Number <span
-                                class="text-danger">*</span></label>
-                        <input type="tel" class="form-control @error('cellphone_number') is-invalid @enderror"
+                                class="text-danger">* </span><span class="text-muted">(09---------)</span></label>
+                        <input type="text" class="form-control @error('cellphone_number') is-invalid @enderror"
                             id="cellphone_number" name="cellphone_number">
                         @error('cellphone_number')
                             <span class="invalid-feedback">{{ $message }}</span>
@@ -175,10 +174,9 @@
                         @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="message" class="form-label">Message <span
-                                class="text-danger">*</span></label>
-                        <textarea class="form-control @error('message') is-invalid @enderror"
-                            id="message" name="message" rows="4"></textarea>
+                        <label for="message" class="form-label">Message <span class="text-danger">*</span></label>
+                        <textarea class="form-control @error('message') is-invalid @enderror" id="message"
+                            name="message" rows="4"></textarea>
                         @error('message')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
@@ -204,6 +202,10 @@
 </div>
 
 <script>
+    document.getElementById('cellphone_number').addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+    });
+
     const createInquiryBtn = document.getElementById('createInquiryBtn');
 
     createInquiryBtn.addEventListener("click", async () => {

@@ -18,6 +18,7 @@ class PropertyController extends Controller
     public function properties()
     {
         $properties = Property::where('status', 'available')
+            ->where('image', '!=', '[]')
             ->orderBy('created_at', 'DESC')
             ->paginate(4);
 
@@ -29,20 +30,25 @@ class PropertyController extends Controller
         return view('admin.properties.addProperties');
     }
 
+    
+
     public function validateAddPropertiesForm(Request $request)
     {
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
             'user_type' => 'required',
             'name' => 'required',
-            'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i',
+            'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i|numeric',
             'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'property_type' => 'required',
             'city' => 'required',
             'address' => 'required',
-            'size' => 'required',
+            'size' => 'required|numeric',
             'property_status' => 'required',
-            'price' => 'required',
+            'price' => 'required|numeric',
+            'bedrooms' => 'numeric',
+            'bathrooms' => 'numeric',
+            'garage' => 'numeric',
 
             'image' => 'required|array',
             'image.*' => 'image|mimes:jpeg,png,jpg|max:2048',
@@ -116,6 +122,7 @@ class PropertyController extends Controller
     public function soldProperties()
     {
         $properties = Property::where('status', 'sold')
+            ->where('image', '!=', '[]')
             ->orderBy('created_at', 'DESC')
             ->paginate(5);
         return view('admin.properties.soldProperties', compact('properties'));
@@ -494,14 +501,17 @@ class PropertyController extends Controller
                 '_token' => 'required',
                 'user_type' => 'required',
                 'name' => 'required',
-                'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i',
+                'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i|numeric',
                 'email' => 'required|email|regex:/^.+@.+\..+$/i',
                 'property_type' => 'required',
                 'city' => 'required',
                 'address' => 'required',
-                'size' => 'required',
+                'size' => 'required|numeric',
                 'property_status' => 'required',
-                'price' => 'required',
+                'price' => 'required|numeric',
+                'bedrooms' => 'numeric',
+                'bathrooms' => 'numeric',
+                'garage' => 'numeric',
             ]);
 
             if ($validator->fails()) {

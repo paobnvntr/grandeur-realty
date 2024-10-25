@@ -75,7 +75,8 @@
                                 <p class="ms-2"><strong>Email: <span class="text-danger d-none"
                                             id="required-icon">*</span></strong> <span
                                         id="clientEmail_{{ $listing->id }}">{{ $listing->email }}</span></p>
-                                <p class="ms-2"><strong>Cellphone Number:</strong> <span
+                                <p class="ms-2"><strong>Cellphone Number: <span class="text-danger d-none"
+                                            id="required-icon">*</span></strong> <span
                                         id="clientPhone_{{ $listing->id }}">{{ $listing->cellphone_number }}</span></p>
                             </div>
                         </div>
@@ -217,6 +218,12 @@
         <input type="text" id="input_cellphone_number_{{ $listing->id }}" name="cellphone_number" class="form-control" value="${originalValues_{{ $listing->id }}.phone.trim()}">
         <small class="text-danger" id="error_cellphone_number_{{ $listing->id }}"></small>`;
 
+        if (document.getElementById('input_cellphone_number_{{ $listing->id }}')) {
+            document.getElementById('input_cellphone_number_{{ $listing->id }}').addEventListener('input', function (e) {
+                e.target.value = e.target.value.replace(/\D/g, '');
+            });
+        }
+
         // Property Details
         const propertyStatus = originalValues_{{ $listing->id }}.propertyStatus.trim();
         const statusOptions = [
@@ -295,7 +302,7 @@
         <small class="text-danger" id="error_address_{{ $listing->id }}"></small>`;
 
         document.getElementById('propertySize_{{ $listing->id }}').innerHTML = `
-        <input type="text" id="input_size_{{ $listing->id }}" name="size" class="form-control" value="${originalValues_{{ $listing->id }}.size.trim().replace(' sqm', '')}">
+        <input type="number" id="input_size_{{ $listing->id }}" name="size" class="form-control" value="${originalValues_{{ $listing->id }}.size.trim().replace(' sqm', '')}">
         <small class="text-danger" id="error_size_{{ $listing->id }}"></small>`;
 
         document.getElementById('propertyBedrooms_{{ $listing->id }}').innerHTML = `
@@ -311,7 +318,7 @@
         <small class="text-danger" id="error_garage_{{ $listing->id }}"></small>`;
 
         document.getElementById('propertyPrice_{{ $listing->id }}').innerHTML = `
-        <input type="text" id="input_price_{{ $listing->id }}" name="price" class="form-control" value="${originalValues_{{ $listing->id }}.price.trim()}">
+        <input type="number" id="input_price_{{ $listing->id }}" name="price" class="form-control" value="${originalValues_{{ $listing->id }}.price.trim()}">
         <small class="text-danger" id="error_price_{{ $listing->id }}"></small>`;
 
         document.getElementById('propertyDescription_{{ $listing->id }}').innerHTML = `

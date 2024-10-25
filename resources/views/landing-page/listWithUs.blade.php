@@ -64,10 +64,10 @@
                             @enderror
                         </div>
                         <div class="col-6 mb-3">
-                            <label for="cell" class="form-label">Cellphone Number <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="cell" name="cellphone_number"
-                                class="form-control @error('cell') is-invalid @enderror" required />
+                            <label for="cell" class="form-label">Cellphone Number <span class="text-danger">*</span>
+                                <span class="text-muted">(09---------)</span></label>
+                            <input type="text" id="cell" name="cellphone_number" maxlength="11"
+                                class="form-control @error('cell') is-invalid @enderror" />
                             @error('cell')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -216,7 +216,8 @@
                         <div class="form-group form-check">
                             <input type="checkbox" class="form-check-input" id="termsCheckbox" name="termsCheckbox">
                             <label class="form-check-label" for="termsCheckbox">I have read and agree to the <span
-                                    data-bs-toggle="modal" data-bs-target="#termsModal" id="termsAndConditionSpan" class="text-decoration-underline">Terms and
+                                    data-bs-toggle="modal" data-bs-target="#termsModal" id="termsAndConditionSpan"
+                                    class="text-decoration-underline">Terms and
                                     Conditions</span> of Grandeur Realty.</label>
                         </div>
 
@@ -234,6 +235,10 @@
 </div>
 
 <script>
+    document.getElementById('cell').addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+    });
+
     const cities = [
         "Alaminos", "Angeles", "Antipolo", "Bacolod", "Bacoor", "Bago", "Baguio", "Bais", "Balanga", "Batac",
         "Batangas", "Bayawan", "Baybay", "Bayugan", "Biñan", "Bislig", "Bogo", "Borongan", "Butuan", "Cabadbaran",

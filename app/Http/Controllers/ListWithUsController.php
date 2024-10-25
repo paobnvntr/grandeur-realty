@@ -206,14 +206,17 @@ class ListWithUsController extends Controller
                 '_token' => 'required',
                 'user_type' => 'required',
                 'name' => 'required',
-                'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i',
+                'cellphone_number' => 'required|regex:/^09[0-9]{9}$/i|numeric',
                 'email' => 'required|email|regex:/^.+@.+\..+$/i',
                 'property_type' => 'required',
                 'city' => 'required',
                 'address' => 'required',
-                'size' => 'required',
+                'size' => 'required|numeric',
                 'property_status' => 'required',
-                'price' => 'required',
+                'price' => 'required|numeric',
+                'bedrooms' => 'numeric',
+                'bathrooms' => 'numeric',
+                'garage' => 'numeric',
             ]);
 
             if ($validator->fails()) {

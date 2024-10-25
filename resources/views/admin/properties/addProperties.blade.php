@@ -2,14 +2,23 @@
 
 @section('contents')
 <div class="container-fluid">
+    @if(Session::has('success'))
+        <div class="alert alert-success" id="alert-success" role="alert">
+            {{ Session::get('success') }}
+        </div>
+    @endif
+
+    @if(Session::has('failed'))
+        <div class="alert alert-danger" id="alert-failed" role="alert">
+            {{ Session::get('failed') }}
+        </div>
+    @endif
+
     <div class="d-flex align-items-center justify-content-between">
         <a href="{{ route('properties.List') }}" class="btn btn-outline-secondary mb-3">
             ← Go Back
         </a>
 
-        <!-- <button class="btn btn-sm btn-info">
-            Import Properties
-        </button> -->
     </div>
 
     <div class="card">
@@ -39,9 +48,10 @@
                     </div>
 
                     <div class="col-6 mb-3">
-                        <label for="cell" class="form-label">Cellphone Number <span class="text-danger">*</span></label>
-                        <input type="text" id="cell" name="cellphone_number"
-                            class="form-control @error('cell') is-invalid @enderror" required />
+                        <label for="cell" class="form-label">Cellphone Number <span class="text-danger">*</span>
+                            <span class="text-muted">(09---------)</span></label>
+                        <input type="text" id="cell" name="cellphone_number" maxlength="11"
+                            class="form-control @error('cell') is-invalid @enderror" />
                         @error('cell')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
@@ -192,6 +202,30 @@
 </div>
 
 <script>
+    document.getElementById('cell').addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+    });
+    
+    document.addEventListener('DOMContentLoaded', (event) => {
+        let successAlert = document.getElementById('alert-success');
+        if (successAlert) {
+            setTimeout(() => {
+                successAlert.style.transition = "opacity 0.5s ease";
+                successAlert.style.opacity = 0;
+                setTimeout(() => { successAlert.remove(); }, 500);
+            }, 4000);
+        }
+
+        let failedAlert = document.getElementById('alert-failed');
+        if (failedAlert) {
+            setTimeout(() => {
+                failedAlert.style.transition = "opacity 0.5s ease";
+                failedAlert.style.opacity = 0;
+                setTimeout(() => { failedAlert.remove(); }, 500);
+            }, 4000);
+        }
+    });
+
     const cities = [
         "Alaminos", "Angeles", "Antipolo", "Bacolod", "Bacoor", "Bago", "Baguio", "Bais", "Balanga", "Batac",
         "Batangas", "Bayawan", "Baybay", "Bayugan", "Biñan", "Bislig", "Bogo", "Borongan", "Butuan", "Cabadbaran",
