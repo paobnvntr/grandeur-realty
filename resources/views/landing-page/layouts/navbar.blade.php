@@ -18,7 +18,8 @@
                             <span class="icon-envelope me-2"></span>
                             <span class="d-none d-md-inline-block">grandeurrealty.ph@gmail.com</span>
                         </a>
-                        <a role="button" style="cursor: pointer;" class="d-flex align-items-center mr-auto copyPhoneNumber">
+                        <a role="button" style="cursor: pointer;"
+                            class="d-flex align-items-center mr-auto copyPhoneNumber">
                             <span class="icon-phone me-2"></span>
                             <span class="d-none d-md-inline-block">+63 917 827 8812</span>
                         </a>
@@ -41,7 +42,8 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-3">
-                    <img class="my-0 site-logo" src="{{ asset('images/grandeur-realty-transparent.png') }}" alt="Grandeur Realty Logo">
+                    <img class="my-0 site-logo" src="{{ asset('images/grandeur-realty-transparent.png') }}"
+                        alt="Grandeur Realty Logo">
                     <!-- <h1 class="my-0 site-logo"><a href="{{ route('home') }}">Grandeur Realty</a></h1> -->
                 </div>
 
@@ -66,18 +68,18 @@
 
                             <ul class="site-menu main-menu js-clone-nav d-none d-lg-block">
                                 <li><a href="{{ route('home') }}#home" class="nav-link">Home</a></li>
-                                <li><a href="{{ route('home') }}#hot-properties" class="nav-link">Properties</a></li>
-                                <!-- <li class="has-children">
-                                    <a href="{{ route('home') }}#hot-properties" class="nav-link">Properties</a>
-                                    <ul class="dropdown arrow-top">
-                                        <li><a href="#" class="nav-link">House and Lot</a></li>
-                                        <li><a href="#" class="nav-link">Apartment</a></li>
-                                        <li><a href="#" class="nav-link">Condominium</a></li>
-                                        <li><a href="#" class="nav-link">Lot Only</a></li>
-                                        <li><a href="#" class="nav-link">Commercial Lot</a></li>
-                                    </ul>
-                                </li> -->
-                                <li><a href="{{ route('home') }}#list-with-us" class="nav-link">List With Us</a></li>
+                                <li>
+                                    <a href="{{ request()->is('/') ? route('home') . '#hot-properties' : route('allProperties') }}"
+                                        class="nav-link">
+                                        Properties
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ request()->is('/') ? route('home') . '#list-with-us' : route('listWithUsForm') }}"
+                                        class="nav-link">
+                                        List With Us
+                                    </a>
+                                </li>
                                 <li><a href="{{ route('home') }}#about" class="nav-link">About</a></li>
                                 <li><a href="{{ route(name: 'contactUsForm') }}" class="nav-link">Contact Us</a></li>
                             </ul>

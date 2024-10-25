@@ -14992,7 +14992,7 @@ nav[aria-label="breadcrumb"] li:before {
 }
 
 .site-footer {
-  background: #efefef;
+  background: var(--bs-primary);
   font-size: 14px;
   color: #888;
   padding: 50px 0 0 0;
@@ -15005,11 +15005,11 @@ nav[aria-label="breadcrumb"] li:before {
 }
 
 .site-footer p a {
-  color: var(--bs-secondary);
+  color: var(--text-color);
 }
 
 .site-footer a:hover {
-  color: var(--bs-secondary);
+  color: var(--text-color-hover);
 }
 
 .site-footer .footer-cta h2,
@@ -15033,7 +15033,7 @@ nav[aria-label="breadcrumb"] li:before {
   font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 15px;
-  color: var(--bs-secondary);
+  color: var(--text-color);
 }
 
 .site-footer .widget .links {
@@ -15072,7 +15072,7 @@ nav[aria-label="breadcrumb"] li:before {
 }
 
 .site-footer .social li a:hover {
-  background: var(--bs-secondary);
+  background: var(--text-color-hover);
   color: #fff;
 }
 

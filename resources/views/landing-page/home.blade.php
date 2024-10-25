@@ -91,22 +91,23 @@
 <div class="section section-4 bg-light" id="about">
     <div class="container">
         <div class="row justify-content-center text-center mb-5">
-            <div class="col-lg-5">
+            <div class="col-lg-7">
                 <h2 class="fw-bolder heading text-primary mb-4">
                     About Grandeur Realty
                 </h2>
                 <p class="text-black-50">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Phasellus convallis lectus et tristique feugiat. Nam imperdiet risus et eros ultrices,
-                    ut bibendum nibh iaculis.
+                    Grandeur Realty is dedicated to transforming the real estate experience by guiding clients through
+                    every step of the property journey. From purchasing a family home to investing in real estate, we
+                    are committed to making your goals a reality.
                 </p>
             </div>
         </div>
 
-        <div class="row justify-content-between mb-5 mx-auto" style="max-width: 1200px;">
+        <div class="row align-items-center justify-content-between mb-5 mx-auto" style="max-width: 1200px;">
             <div class="col-lg-7 mb-5 mb-lg-0 order-lg-2">
                 <div class="img-about dots text-center">
-                    <img src="{{ asset('images/grandeur-realty-about.jpg') }}" alt="Image" class="img-fluid img-thumbnail" />
+                    <img src="{{ asset('images/grandeur-realty-about.jpg') }}" alt="About Grandeur Realty"
+                        class="img-fluid img-thumbnail" />
                 </div>
             </div>
             <div class="col-lg-4 d-flex flex-column justify-content-center">
@@ -117,21 +118,23 @@
                     <div class="feature-text">
                         <h3 class="heading">Our Mission</h3>
                         <p class="text-black-50">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ligula nibh,
-                            lacinia et diam eget, tempor facilisis orci. Ut ac libero at ante lacinia pulvinar.
+                            To provide an exceptional, personalized real estate experience that goes beyond
+                            transactions. We are passionate about helping clients build lasting wealth and find places
+                            they can call home, delivering quality service and professional expertise.
                         </p>
                     </div>
                 </div>
 
-                <div class="d-flex feature-h">
+                <div class="d-flex feature-h mb-0">
                     <span class="wrap-icon me-3">
                         <span class="icon-eye"></span>
                     </span>
                     <div class="feature-text">
                         <h3 class="heading">Our Vision</h3>
                         <p class="text-black-50">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ligula nibh,
-                            lacinia et diam eget, tempor facilisis orci. Ut ac libero at ante lacinia pulvinar.
+                            To become a trusted leader in the real estate industry, recognized for our integrity,
+                            dedication, and commitment to excellence. We envision a world where property ownership is
+                            accessible and rewarding for everyone, creating lasting value for generations to come.
                         </p>
                     </div>
                 </div>

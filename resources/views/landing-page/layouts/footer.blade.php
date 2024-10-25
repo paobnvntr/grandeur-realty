@@ -1,11 +1,15 @@
 <div class="site-footer">
     <div class="container">
         <div class="row">
-            <div class="col-lg-5">
+            <div class="col-lg-4">
                 <div class="widget">
-                    <h1>Grandeur Realty</h1>
-                    <address>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ligula nibh,
-                        lacinia et diam eget, tempor facilisis orci. Ut ac libero at ante lacinia pulvinar.</address>
+                    <img src="{{ asset('images/grandeur-realty-footer.png') }}" alt="Grandeur Realty Logo"
+                        style="width: 70%;" class="pb-2 ms-2">
+                    <!-- <h1>Grandeur Realty</h1> -->
+                    <address>Your go-to platform for exploring top real
+                        estate opportunities across the Philippines. Discover insights into the real estate market—all
+                        designed to help you make informed and
+                        confident decisions.</address>
                     <p>Phone: <a class="copyPhoneNumber" role="button" style="cursor: pointer;">
                             <span class="d-none d-md-inline-block">+63 917 827 8812</span>
                         </a></p>
