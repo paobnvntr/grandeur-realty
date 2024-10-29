@@ -76,7 +76,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('settings', 'settings')->name('properties.settings');
 
-        Route::get('edit-hot-properties-images', 'editHotPropertiesImages')->name('properties.editHotPropertiesImages');
+        Route::get('edit-hot-properties', 'editHotProperties')->name('properties.editHotProperties');
+        Route::post('validateAddHotPropertiesForm', 'validateAddHotPropertiesForm')->name('properties.validateAddHotPropertiesForm');
+        Route::post('saveAddHotProperties', 'saveAddHotProperties')->name('properties.saveAddHotProperties');
+        Route::delete('deleteHotProperties/{id}', 'deleteHotProperties')->name('properties.deleteHotProperties');
         Route::post('validateEditHotPropertiesImagesForm', 'validateEditHotPropertiesImagesForm')->name('properties.validateEditHotPropertiesImagesForm');
         Route::post('saveEditHotPropertiesImages/{id}', 'saveEditHotPropertiesImages')->name('properties.saveEditHotPropertiesImages');
         

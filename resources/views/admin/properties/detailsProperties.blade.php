@@ -109,7 +109,7 @@
                                     </p>
                                     <p class="ms-2"><strong>Size: <span class="text-danger d-none"
                                                 id="required-icon">*</span></strong> <span
-                                            id="propertySize_{{ $property->id }}">{{ $property->size }} sqm</span></p>
+                                            id="propertySize_{{ $property->id }}">{{ $property->size }}m²</span></p>
                                 </div>
                                 <div class="col-6">
                                     <p class="ms-2"><strong>Bedrooms:</strong> <span

@@ -7,7 +7,7 @@ use App\Models\ListWithUs;
 use App\Models\PropertiesFeature;
 use App\Models\Property;
 use App\Models\User;
-use App\Models\HotPropertiesImage;
+use App\Models\HotProperties;
 use App\Notifications\NewListWithUs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -23,25 +23,26 @@ class LandingPageController extends Controller
             '../images/hero_bg_1.jpg'
         ];
 
-        $cities = Property::select('city')
-            ->where('status', 'available')
-            ->where('image', '!=', '[]')
-            ->selectRaw('count(*) as property_count')
-            ->groupBy('city')
-            ->orderBy('property_count', 'desc')
-            ->limit(6)
-            ->get();
+        $cities = HotProperties::orderBy('priority', 'asc')->limit(6)->get();
 
-        $cityImages = HotPropertiesImage::whereIn('hot_properties_name', $cities->pluck('city'))->get()->keyBy('hot_properties_name');
+        if ($cities->isEmpty()) {
+            $cities = Property::select('city')
+                ->where('status', 'available')
+                ->where('image', '!=', '[]')
+                ->selectRaw('count(*) as property_count')
+                ->groupBy('city')
+                ->orderBy('property_count', 'desc')
+                ->limit(6)
+                ->get();
 
-        foreach ($cities as $city) {
-            // Check if the city has an associated image
-            if ($cityImages->has($city->city)) {
-                // Use the image from the hot_properties_images table
-                $city->image_url = asset('uploads/hot_properties/' . $cityImages->get($city->city)->image);
-            } else {
-                // Randomly select a default image
+            foreach ($cities as $city) {
                 $city->image_url = $defaultImages[array_rand($defaultImages)];
+            }
+        } else {
+            foreach ($cities as $city) {
+                $city->image_url = $city->image
+                    ? asset('uploads/hot_properties/' . $city->image)
+                    : $defaultImages[array_rand($defaultImages)];
             }
         }
 
@@ -64,25 +65,26 @@ class LandingPageController extends Controller
             '../images/hero_bg_1.jpg'
         ];
 
-        $cities = Property::select('city')
-            ->where('status', 'available')
-            ->where('image', '!=', '[]')
-            ->selectRaw('count(*) as property_count')
-            ->groupBy('city')
-            ->orderBy('property_count', 'desc')
-            ->limit(6)
-            ->get();
+        $cities = HotProperties::orderBy('priority', 'asc')->limit(6)->get();
 
-        $cityImages = HotPropertiesImage::whereIn('hot_properties_name', $cities->pluck('city'))->get()->keyBy('hot_properties_name');
+        if ($cities->isEmpty()) {
+            $cities = Property::select('city')
+                ->where('status', 'available')
+                ->where('image', '!=', '[]')
+                ->selectRaw('count(*) as property_count')
+                ->groupBy('city')
+                ->orderBy('property_count', 'desc')
+                ->limit(6)
+                ->get();
 
-        foreach ($cities as $city) {
-            // Check if the city has an associated image
-            if ($cityImages->has($city->city)) {
-                // Use the image from the hot_properties_images table
-                $city->image_url = asset('uploads/hot_properties/' . $cityImages->get($city->city)->image);
-            } else {
-                // Randomly select a default image
+            foreach ($cities as $city) {
                 $city->image_url = $defaultImages[array_rand($defaultImages)];
+            }
+        } else {
+            foreach ($cities as $city) {
+                $city->image_url = $city->image
+                    ? asset('uploads/hot_properties/' . $city->image)
+                    : $defaultImages[array_rand($defaultImages)];
             }
         }
 

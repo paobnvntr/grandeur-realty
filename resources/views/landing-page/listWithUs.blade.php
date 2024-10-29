@@ -125,7 +125,7 @@
                         </div>
 
                         <div class="col-6 mb-3">
-                            <label for="size" class="form-label">Size (Square Footage) <span
+                            <label for="size" class="form-label">Size (Square Meters) <span
                                     class="text-danger">*</span></label>
                             <input type="number" id="size" name="size"
                                 class="form-control @error('size') is-invalid @enderror" required />

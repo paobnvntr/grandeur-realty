@@ -21,20 +21,49 @@
 
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Properties Settings - Hot Properties Images</h5>
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="card-title">Properties Settings - Hot Properties</h5>
+                @if ($cities->count() < 6)
+                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
+                        data-bs-target="#addHotPropertyModal" onclick="hideEditForm()">
+                        Add Hot Properties
+                    </button>
+                @endif
+            </div>
+
+            @include('admin.properties.partials.addHotProperties')
 
             <div class="card-body">
+                @php
+                    $totalSlots = 6;
+                @endphp
+
                 <div class="row button-row">
-                    @foreach($cities as $city)
-                        <div class="col-md-6 mb-3">
-                            <a type="button" class="city-card" style="background-image: url('{{ $city->image_url }}');"
-                                onclick="showEditForm('{{ $city->id }}', '{{ $city->city }}')">
-                                <div class="city-overlay">
-                                    <span class="city-name">{{ $city->city }}</span>
-                                </div>
-                            </a>
-                        </div>
-                    @endforeach
+                    @for ($i = 1; $i <= $totalSlots; $i++)
+                                        @php
+                                            $city = $cities->firstWhere('priority', $i);
+                                        @endphp
+
+                                        <div class="col-md-6 mb-3">
+                                            <a type="button" class="city-card"
+                                                style="background-image: url('{{ $city ? $city->image_url : '' }}');"
+                                                onclick="{{ $city ? 'showEditForm(\'' . $city->id . '\', \'' . $city->city . '\')' : 'openAddModal(' . $i . ')' }}">
+
+                                                <div class="ribbon bg-dark">#{{ $i }}</div>
+                                                @if ($city)
+                                                    <button type="button" class="btn btn-sm btn-danger remove-btn" data-bs-toggle="modal"
+                                                        data-bs-target="#removeHotPropertyModal{{$city->id}}">
+                                                        Remove
+                                                    </button>
+
+                                                    @include('admin.properties.partials.removeHotProperties')
+                                                @endif
+                                                <div class="city-overlay">
+                                                    <span class="city-name">{{ $city ? $city->city : 'No City' }}</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                    @endfor
                 </div>
 
                 <!-- Hidden form for editing image, shown below the rows -->
@@ -45,17 +74,19 @@
                         <input type="hidden" name="city" id="city-name-input">
                         <div class="form-group">
                             <label for="image-upload">Upload New Background Image for <strong><span
-                                        id="city-name-label"></span></strong>:</span></label>
-                            <input type="file" name="image" class="form-control @error('image') is-invalid @enderror"
-                                id="image-upload" accept=".jpg, .jpeg, .png">
-                            @error('image')
+                                        id="city-name-label"></span></strong>:</span> <span
+                                    class="text-danger">*</span></label>
+                            <input type="file" name="image_edit"
+                                class="form-control @error('image_edit') is-invalid @enderror" id="image-upload"
+                                accept=".jpg, .jpeg, .png" required>
+                            @error('image_edit')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
                             @enderror
                         </div>
                         <div class="mt-3 d-flex align-items-center justify-content-end">
-                            <button type="button" class="btn btn-success me-2" id="save-image-btn">Save</button>
+                            <button type="button" class="btn btn-warning me-2" id="save-image-btn">Edit Image</button>
                             <button type="button" class="btn btn-danger" onclick="hideEditForm()">Cancel</button>
                         </div>
                     </form>
@@ -65,7 +96,41 @@
     </div>
 </div>
 
+<style>
+    .empty-city-card {
+        background-color: #e0e0e0;
+    }
+
+    .ribbon {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: #fff;
+        padding: 5px 10px;
+        font-weight: bold;
+        font-size: 14px;
+        border-radius: 4px;
+        z-index: 1;
+    }
+
+    .remove-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+    }
+</style>
+
 <script>
+    function openAddModal(slot) {
+        const slotField = document.getElementById('slot');
+        slotField.value = slot;
+
+        var modal = new bootstrap.Modal(document.getElementById('addHotPropertyModal'));
+        modal.show();
+        hideEditForm();
+    }
+
     document.addEventListener('DOMContentLoaded', (event) => {
         let successAlert = document.getElementById('alert-success');
         if (successAlert) {
@@ -122,7 +187,7 @@
 
     saveImageBtn.addEventListener('click', async () => {
         saveImageBtn.disabled = true;
-        saveImageBtn.textContent = 'Saving...';
+        saveImageBtn.textContent = 'Editing...';
 
         const form = document.getElementById('city-form');
         const formData = new FormData(form);
@@ -140,7 +205,7 @@
 
             if (data.message === 'Validation failed') {
                 saveImageBtn.disabled = false;
-                saveImageBtn.textContent = 'Save';
+                saveImageBtn.textContent = 'Edit Image';
 
                 // Clear previous error messages
                 const inputElements = document.querySelectorAll('.is-invalid');
@@ -168,7 +233,7 @@
         } catch (error) {
             console.error('Error:', error);
             saveImageBtn.disabled = false;
-            saveImageBtn.textContent = 'Save'; // Re-enable the button
+            saveImageBtn.textContent = 'Edit Image'; // Re-enable the button
         }
     });
 

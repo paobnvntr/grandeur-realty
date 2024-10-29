@@ -92,11 +92,11 @@
                 <div class="col-md-4">
                     <select id="sizeRange" name="size_range" class="form-select">
                         <option value="">Select Size Range</option>
-                        <option value="0-500">0 - 500 ft²</option>
-                        <option value="501-1000">501 - 1000 ft²</option>
-                        <option value="1001-2000">1001 - 2000 ft²</option>
-                        <option value="2001-5000">2001 - 5000 ft²</option>
-                        <option value="5001">5001 ft² and above</option>
+                        <option value="0-500">0 - 500 m²</option>
+                        <option value="501-1000">501 - 1000 m²</option>
+                        <option value="1001-2000">1001 - 2000 m²</option>
+                        <option value="2001-5000">2001 - 5000 m²</option>
+                        <option value="5001">5001 m² and above</option>
                     </select>
                 </div>
 
@@ -220,7 +220,7 @@
                 ${property.size !== 0 ? `
                     <span class="d-block d-flex align-items-center me-3">
                         <span class="icon-arrows-alt me-2"></span>
-                        <span class="caption">${property.size} ft²</span>
+                        <span class="caption">${property.size} m²</span>
                     </span>
                 ` : ''}
                 ${property.bedrooms !== 0 ? `

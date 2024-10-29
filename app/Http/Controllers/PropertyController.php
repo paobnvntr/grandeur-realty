@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\PropertiesFeature;
 use App\Models\Property;
-use App\Models\HotPropertiesImage;
+use App\Models\HotProperties;
 use App\Models\Log;
-use App\Models\ListingAnalytics;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,8 +28,6 @@ class PropertyController extends Controller
     {
         return view('admin.properties.addProperties');
     }
-
-    
 
     public function validateAddPropertiesForm(Request $request)
     {
@@ -113,10 +110,38 @@ class PropertyController extends Controller
         $createProperty = Property::create($propertyData);
 
         if ($createProperty) {
+            $this->logPropertyAddSuccess($createProperty->id, Auth::user()->username);
+
             return redirect()->route('properties.List')->with('success', 'Property added successfully!');
         } else {
+            $this->logPropertyAddFailed(Auth::user()->username);
+
             return redirect()->route('properties.List')->with('error', 'Failed to add property!');
         }
+    }
+
+    private function logPropertyAddSuccess($propertyId, $username)
+    {
+        Log::create([
+            'type' => 'Add Property',
+            'user' => $username,
+            'subject' => 'Add Property Success',
+            'message' => "$username has successfully added a new property with ID: $propertyId.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+    }
+
+    private function logPropertyAddFailed($username)
+    {
+        Log::create([
+            'type' => 'Add Property',
+            'user' => $username,
+            'subject' => 'Add Property Failed',
+            'message' => "$username failed to add a new property.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
     }
 
     public function soldProperties()
@@ -299,7 +324,7 @@ class PropertyController extends Controller
         return view('admin.properties.settingsProperties');
     }
 
-    public function editHotPropertiesImages()
+    public function editHotProperties()
     {
         $defaultImages = [
             '../images/hero_bg_3.jpg',
@@ -307,37 +332,130 @@ class PropertyController extends Controller
             '../images/hero_bg_1.jpg'
         ];
 
-        $cities = Property::select('city')
-            ->where('status', 'available')
-            ->selectRaw('count(*) as property_count')
-            ->groupBy('city')
-            ->orderBy('property_count', 'desc')
-            ->limit(6)
-            ->get();
+        $cities = HotProperties::orderBy('priority', 'asc')->limit(6)->get();
 
-        $cityImages = HotPropertiesImage::whereIn('hot_properties_name', $cities->pluck('city'))->get()->keyBy('hot_properties_name');
-
-        foreach ($cities as $city) {
-            // Check if the city has an associated image
-            if ($cityImages->has($city->city)) {
-                // Use the image from the hot_properties_images table
-                $city->image_url = asset('uploads/hot_properties/' . $cityImages->get($city->city)->image);
-            } else {
-                // Randomly select a default image
-                $city->image_url = $defaultImages[array_rand($defaultImages)];
+        if ($cities->isNotEmpty()) {
+            foreach ($cities as $city) {
+                $city->image_url = $city->image
+                    ? asset('uploads/hot_properties/' . $city->image)
+                    : $defaultImages[array_rand($defaultImages)];
             }
         }
 
-        return view('admin.properties.imagesHotProperties', compact('cities'));
+        $totalSlots = 6;
+        $occupiedSlots = HotProperties::pluck('priority')->toArray();
+
+        $availableSlots = [];
+        for ($i = 1; $i <= $totalSlots; $i++) {
+            if (!in_array($i, $occupiedSlots)) {
+                $availableSlots[] = $i;
+            }
+        }
+
+        return view('admin.properties.imagesHotProperties', compact('cities', 'availableSlots'));
+    }
+
+    public function validateAddHotPropertiesForm(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            '_token' => 'required',
+            'slot' => 'required|numeric',
+            'city' => 'required|unique:hot_properties,city',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
+        } else {
+            return response()->json(['message' => 'Validation passed']);
+        }
+    }
+
+    public function saveAddHotProperties(Request $request)
+    {
+        $city = trim($request->city);
+
+        // Check if the city already exists
+        $existingCity = HotProperties::where('city', $city)->first();
+
+        if ($existingCity) {
+            return redirect()->route('properties.editHotProperties')->with('error', 'City already exists!');
+        }
+
+        $addHotProperties = HotProperties::create([
+            'city' => $city,
+            'image' => $this->uploadAddHotPropertiesImage($request, $city),
+            'priority' => $request->slot,
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+
+        if ($addHotProperties) {
+            $this->logAddHotProperties($city, Auth::user()->username);
+
+            return redirect()->route('properties.editHotProperties')->with('success', 'Hot Properties Added Successfully!');
+        } else {
+            $this->logAddHotPropertiesFailed($city, Auth::user()->username);
+
+            return redirect()->route('properties.editHotProperties')->with('error', 'Failed to add hot properties!');
+        }
+    }
+
+    private function uploadAddHotPropertiesImage($request, $city)
+    {
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            // Generate a filename using the city name and current timestamp
+            $fileName = strtolower(str_replace([' ', ','], '_', $city)) . '_' . time() . '.' . $image->getClientOriginalExtension(); // Create the new filename
+
+            $image->move(public_path('uploads/hot_properties'), $fileName); // Move the file to the unique folder
+
+            return $fileName;
+        }
+
+        return null;
+    }
+
+    private function logAddHotProperties($city, $username)
+    {
+        Log::create([
+            'type' => 'Add Hot Properties',
+            'user' => $username,
+            'subject' => 'Add Hot Properties Success',
+            'message' => "$username has successfully added the hot properties for $city.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+    }
+
+    private function logAddHotPropertiesFailed($city, $username)
+    {
+        Log::create([
+            'type' => 'Add Hot Properties',
+            'user' => $username,
+            'subject' => 'Add Hot Properties Failed',
+            'message' => "$username failed to add the hot properties for $city.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
     }
 
     public function validateEditHotPropertiesImagesForm(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            '_token' => 'required',
-            'city' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                '_token' => 'required',
+                'city' => 'required',
+                'image_edit' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            ],
+            [
+                'image_edit.required' => 'Please upload an image.',
+                'image_edit.image' => 'The uploaded file must be an image.',
+                'image_edit.mimes' => 'The uploaded image must be a type of: jpeg, png, jpg',
+                'image_edit.max' => 'The uploaded image must not be greater than 2MB.',
+            ]
+        );
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
@@ -348,43 +466,124 @@ class PropertyController extends Controller
 
     public function saveEditHotPropertiesImages(Request $request, $city)
     {
-        // Retrieve the hot properties image record for the given city
-        $hotPropertiesImage = HotPropertiesImage::where('hot_properties_name', $city)->first();
+        $hotPropertiesImage = HotProperties::where('city', $city)->first();
 
-        // Check if the hot properties image exists
-        if ($hotPropertiesImage) {
-            // Delete the existing image file if it exists
-            if (file_exists(public_path('uploads/hot_properties/' . $hotPropertiesImage->image))) {
-                unlink(public_path('uploads/hot_properties/' . $hotPropertiesImage->image)); // Delete the old image
-            }
-
-            // Update the record with the new image
-            $hotPropertiesImage->update([
-                'image' => $this->uploadHotPropertiesImage($request, $city),
-                'updated_at' => now('Asia/Manila'),
-            ]);
-        } else {
-            // Create a new record if it does not exist
-            HotPropertiesImage::create([
-                'hot_properties_name' => $city,
-                'image' => $this->uploadHotPropertiesImage($request, $city),
-                'created_at' => now('Asia/Manila'),
-                'updated_at' => now('Asia/Manila'),
-            ]);
+        if (!$hotPropertiesImage) {
+            return redirect()->route('properties.editHotProperties')->with('error', 'City not found!');
         }
 
-        return redirect()->route('properties.editHotPropertiesImages')->with('success', 'Hot Properties Image Updated Successfully!');
+        $this->deleteExistingImage($hotPropertiesImage->image);
+
+        $editHotProperties = $hotPropertiesImage->update([
+            'image' => $this->uploadHotPropertiesImage($request, $city),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+
+        if ($editHotProperties) {
+            $this->logEditHotProperties($city, Auth::user()->username);
+
+            return redirect()->route('properties.editHotProperties')->with('success', 'Hot Properties Image Updated Successfully!');
+        } else {
+            $this->logEditHotPropertiesFailed($city, Auth::user()->username);
+
+            return redirect()->route('properties.editHotProperties')->with('error', 'Failed to update hot properties image!');
+        }
+    }
+
+    private function deleteExistingImage($image)
+    {
+        if (!$image) {
+            return;
+        }
+
+        $imagePath = public_path('uploads/hot_properties/' . $image);
+
+        if (file_exists($imagePath) && is_file($imagePath)) {
+            unlink($imagePath);
+        }
     }
 
     private function uploadHotPropertiesImage($request, $city)
     {
-        $image = $request->file('image');
-        // Generate a filename using the city name and current timestamp
+        $image = $request->file('image_edit');
+
         $fileName = strtolower(str_replace([' ', ','], '_', $city)) . '_' . time() . '.' . $image->getClientOriginalExtension(); // Create the new filename
 
         $image->move(public_path('uploads/hot_properties'), $fileName); // Move the file to the unique folder
 
         return $fileName;
+    }
+
+    private function logEditHotProperties($city, $username)
+    {
+        Log::create([
+            'type' => 'Edit Hot Properties',
+            'user' => $username,
+            'subject' => 'Edit Hot Properties Success',
+            'message' => "$username has successfully updated the hot properties image for $city.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+    }
+
+    private function logEditHotPropertiesFailed($city, $username)
+    {
+        Log::create([
+            'type' => 'Edit Hot Properties',
+            'user' => $username,
+            'subject' => 'Edit Hot Properties Failed',
+            'message' => "$username failed to update the hot properties image for $city.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+    }
+
+    public function deleteHotProperties(string $id)
+    {
+        $hotProperties = HotProperties::findOrFail($id);
+        $city = $hotProperties->city;
+
+        if (!$hotProperties) {
+            return redirect()->route('properties.editHotProperties')->with('error', 'City not found!');
+        }
+
+        $this->deleteExistingImage($hotProperties->image);
+
+        $deleteHotProperties = $hotProperties->delete();
+
+        if ($deleteHotProperties) {
+            $this->logDeleteHotProperties($city, Auth::user()->username);
+
+            return redirect()->route('properties.editHotProperties')->with('success', 'Hot Properties Deleted Successfully!');
+        } else {
+            $this->logDeleteHotPropertiesFailed($city, Auth::user()->username);
+
+            return redirect()->route('properties.editHotProperties')->with('error', 'Failed to delete hot properties!');
+        }
+    }
+
+    private function logDeleteHotProperties($city, $username)
+    {
+        Log::create([
+            'type' => 'Delete Hot Properties',
+            'user' => $username,
+            'subject' => 'Delete Hot Properties Success',
+            'message' => "$username has successfully deleted the hot properties for $city.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
+    }
+
+    private function logDeleteHotPropertiesFailed($city, $username)
+    {
+        Log::create([
+            'type' => 'Delete Hot Properties',
+            'user' => $username,
+            'subject' => 'Delete Hot Properties Failed',
+            'message' => "$username failed to delete the hot properties for $city.",
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ]);
     }
 
     public function editPropertiesFeatures()

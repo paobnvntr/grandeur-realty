@@ -8,7 +8,7 @@
         <div class="row justify-content-center align-items-center">
             <div class="col-lg-9 text-center mt-5">
                 <h1 class="heading" data-aos="fade-up">For {{ ucfirst($property->property_status) }}:
-                    {{ $property->size }} ft² {{ ucfirst($property->property_type) }} in {{ $property->city }}
+                    {{ $property->size }} m² {{ ucfirst($property->property_type) }} in {{ $property->city }}
                 </h1>
 
                 <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="200">
@@ -66,7 +66,7 @@
 
             <!-- Property Description -->
             <h2 class="mt-4 h4 mb-4 fw-bold">For {{ ucfirst($property->property_status) }}:
-                {{ $property->size }} ft² {{ ucfirst($property->property_type) }} in {{ $property->city }}
+                {{ $property->size }} m² {{ ucfirst($property->property_type) }} in {{ $property->city }}
             </h2>
             <div class="row">
                 <div class="col-8">
@@ -82,7 +82,7 @@
                 <div class="col-4">
                     <p class="mb-2 text-muted">
                         <span class="icon-arrows-alt text-warning me-2"></span>
-                        {{ $property->size }} ft²
+                        {{ $property->size }} m²
                     </p>
                     <p class="text-muted">
                         <span class="icon-money text-success me-2"></span>
@@ -132,7 +132,7 @@
                 <form action="{{ route('saveInquiry', $property->id) }}" method="POST" id="createInquiryForm">
                     @csrf
                     <input type="hidden" name="property_name"
-                        value="For {{ ucfirst($property->property_status) }}: {{ $property->size }} ft² {{ ucfirst($property->property_type) }} in {{ $property->city }}">
+                        value="For {{ ucfirst($property->property_status) }}: {{ $property->size }} m² {{ ucfirst($property->property_type) }} in {{ $property->city }}">
 
                     <div class="mb-3">
                         <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>

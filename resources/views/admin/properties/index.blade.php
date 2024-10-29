@@ -61,7 +61,7 @@
                                     @foreach($properties as $index => $property)
                                         <tr>
                                             <td class="ps-0 sticky-column-left">{{ $index + 1 }}</td>
-                                            <td>For {{ ucfirst($property->property_status) }}: {{ $property->size }} ft²
+                                            <td>For {{ ucfirst($property->property_status) }}: {{ $property->size }} m²
                                                 {{ ucfirst($property->property_type) }} in {{ $property->city }}</td>
                                             <td>{{ \Illuminate\Support\Str::title($property->name) }}</td>
                                             <td>{{ $property->created_at->format('Y-m-d') }}</td>

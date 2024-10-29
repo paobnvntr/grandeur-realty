@@ -16,10 +16,10 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title
-                            ">Hot Properties Images</h5>
-                            <p class="card-text">Here you can manage the images of Hot Properties Section.</p>
+                            ">Hot Properties</h5>
+                            <p class="card-text">Here you can manage the content of Hot Properties Section.</p>
 
-                            <a href="{{ route('properties.editHotPropertiesImages') }}" class="btn btn-warning">Edit Images</a>
+                            <a href="{{ route('properties.editHotProperties') }}" class="btn btn-warning">Edit Hot Properties</a>
                         </div>
                     </div>
                 </div>
