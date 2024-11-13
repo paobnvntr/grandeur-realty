@@ -137,7 +137,18 @@ class AuthController extends Controller
                     }
                 },
             ],
-            'password' => 'required|string|min:8|confirmed'
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                function ($attribute, $value, $fail) use ($request) {
+                    $user = User::where('username', $request->input('username'))->first();
+                    if ($user && Hash::check($value, $user->password)) {
+                        $fail('The new password cannot be the same as the current password.');
+                    }
+                },
+            ],
         ]);
 
         $email = User::where('username', $request->username)->value('email');

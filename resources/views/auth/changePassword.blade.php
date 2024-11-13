@@ -23,7 +23,7 @@
                                     <label for="username" class="form-label">Username</label>
                                     <input type="text" class="form-control @error('username') is-invalid @enderror"
                                         id="username" name="username" value="{{ $username }}"
-                                        aria-describedby="username" disabled>
+                                        aria-describedby="username" readonly>
                                     @error('username')
                                         <div class="invalid-feedback">
                                             {{ $message }}
