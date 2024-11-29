@@ -15,7 +15,7 @@
             <div class="col-lg-9 text-center">
                 <div class="sub-heading text-uppercase mb-4" data-aos="fade-up">Welcome To
                     Grandeur Realty!</div>
-                <h1 class="heading" data-aos="fade-up">
+                <h1 class="heading" data-aos="fade-up" data-aos-delay="100">
                     Your Needs, Our Priority: Buy, Sell, Lease with Ease
                 </h1>
             </div>
@@ -25,7 +25,7 @@
 
 <div class="section" id="hot-properties">
     <div class="container">
-        <div class="row mb-5 align-items-center">
+        <div class="row mb-5 align-items-center" data-aos="fade-up">
             <div class="col-lg-6">
                 <h2 class="fw-bolder text-primary heading">
                     Hot Properties
@@ -43,7 +43,7 @@
         <div class="container mt-5">
             <div class="row button-row">
                 @foreach($cities as $city)
-                    <div class="col-6 mb-3">
+                    <div class="col-6 mb-3" data-aos="fade-up" data-aos-delay="200">
                         <a href="{{ route('hotProperties', ['city' => $city->city]) }}" class="city-card"
                             style="background-image: url('{{ $city->image_url }}');">
                             <div class="city-overlay">
@@ -61,7 +61,7 @@
     <div class="container">
         <div class="row">
             @foreach ($features as $feature)
-                <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
                     <div class="box-feature">
                         <span class="{{ $feature['icon'] }}"></span>
                         <h3 class="mb-3">{{ $feature['title'] }}</h3>
@@ -90,7 +90,7 @@
 
 <div class="section section-4 bg-light" id="about">
     <div class="container">
-        <div class="row justify-content-center text-center mb-5">
+        <div class="row justify-content-center text-center mb-5" data-aos="fade-up">
             <div class="col-lg-7">
                 <h2 class="fw-bolder heading text-primary mb-4">
                     About Grandeur Realty
@@ -104,14 +104,14 @@
         </div>
 
         <div class="row align-items-center justify-content-between mb-5 mx-auto" style="max-width: 1200px;">
-            <div class="col-lg-7 mb-5 mb-lg-0 order-lg-2">
+            <div class="col-lg-7 mb-5 mb-lg-0 order-lg-2" data-aos="fade-up" data-aos-delay="200">
                 <div class="img-about dots text-center">
                     <img src="{{ asset('images/grandeur-realty-about.jpg') }}" alt="About Grandeur Realty"
                         class="img-fluid img-thumbnail" />
                 </div>
             </div>
             <div class="col-lg-4 d-flex flex-column justify-content-center">
-                <div class="d-flex feature-h mb-4">
+                <div class="d-flex feature-h mb-4" data-aos="fade-up" data-aos-delay="100">
                     <span class="wrap-icon me-3">
                         <span class="icon-bullseye"></span>
                     </span>
@@ -125,7 +125,7 @@
                     </div>
                 </div>
 
-                <div class="d-flex feature-h mb-0">
+                <div class="d-flex feature-h mb-0" data-aos="fade-up" data-aos-delay="300">
                     <span class="wrap-icon me-3">
                         <span class="icon-eye"></span>
                     </span>

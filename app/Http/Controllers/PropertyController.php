@@ -179,7 +179,7 @@ class PropertyController extends Controller
     public function logPropertySoldSuccess($propertyId)
     {
         Log::create([
-            'type' => 'success',
+            'type' => 'Marked as Sold',
             'user' => auth()->user()->username,
             'subject' => 'Property Sold',
             'message' => "Property with ID {$propertyId} was marked as sold.",
@@ -191,7 +191,7 @@ class PropertyController extends Controller
     public function logPropertySoldFailed($propertyId, $errorMessage)
     {
         Log::create([
-            'type' => 'error',
+            'type' => 'Marked as Sold',
             'user' => auth()->user()->username,
             'subject' => 'Property Sale Failed',
             'message' => "Failed to mark property with ID {$propertyId} as sold. Error: {$errorMessage}",
@@ -226,7 +226,7 @@ class PropertyController extends Controller
     public function logPropertyAvailableSuccess($propertyId)
     {
         Log::create([
-            'type' => 'success',
+            'type' => 'Marked as Available',
             'user' => auth()->user()->username,
             'subject' => 'Property Available',
             'message' => "Property with ID {$propertyId} was marked as available.",
@@ -238,7 +238,7 @@ class PropertyController extends Controller
     public function logPropertyAvailableFailed($propertyId, $errorMessage)
     {
         Log::create([
-            'type' => 'error',
+            'type' => 'Marked as Available',
             'user' => auth()->user()->username,
             'subject' => 'Property Availability Failed',
             'message' => "Failed to mark property with ID {$propertyId} as available. Error: {$errorMessage}",
