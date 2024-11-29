@@ -67,7 +67,7 @@
                             <label for="cell" class="form-label">Cellphone Number <span class="text-danger">*</span>
                                 <span class="text-muted">(09---------)</span></label>
                             <input type="text" id="cell" name="cellphone_number" maxlength="11"
-                                class="form-control @error('cell') is-invalid @enderror" />
+                                class="form-control @error('cell') is-invalid @enderror" required />
                             @error('cell')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -147,7 +147,7 @@
                             @enderror
                         </div>
                         <div class="col-12 mb-3 d-none" id="priceField">
-                            <label for="price" class="form-label" id="priceLabel">Selling Price <span
+                            <label for="price" class="form-label" id="priceLabel">Selling Price (₱) <span
                                     class="text-danger">*</span></label>
                             <input type="number" id="price" name="price"
                                 class="form-control @error('price') is-invalid @enderror" />
@@ -159,7 +159,7 @@
                         <div class="col-4 mb-3">
                             <label for="bedrooms" class="form-label">Bedroom(s)</label>
                             <input type="number" id="bedrooms" name="bedrooms" class="form-control"
-                                value="{{ old('bedrooms') }}" />
+                                value="{{ old('bedrooms') ?? 0 }}" />
                             @error('bedrooms')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -168,7 +168,7 @@
                         <div class="col-4 mb-3">
                             <label for="bathrooms" class="form-label">Bathroom(s)</label>
                             <input type="number" id="bathrooms" name="bathrooms" class="form-control"
-                                value="{{ old('bathrooms') }}" />
+                                value="{{ old('bathrooms') ?? 0 }}" />
                             @error('bathrooms')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -177,7 +177,7 @@
                         <div class="col-4 mb-3">
                             <label for="garage" class="form-label">Garage(s)</label>
                             <input type="number" id="garage" name="garage" class="form-control"
-                                value="{{ old('garage') }}" />
+                                value="{{ old('garage') ?? 0 }}" />
                             @error('garage')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -287,8 +287,8 @@
 
     function updatePriceLabel(propertyStatus) {
         document.getElementById('priceLabel').innerHTML = propertyStatus === 'sale'
-            ? 'Selling Price per SQM <span class="text-danger">*</span>'
-            : 'Lease Rate (per month) <span class="text-danger">*</span>';
+            ? 'Selling Price per SQM (₱) <span class="text-danger">*</span>'
+            : 'Lease Rate per Month (₱) <span class="text-danger">*</span>';
     }
 
     document.getElementById('propertyStatus').addEventListener('change', function () {

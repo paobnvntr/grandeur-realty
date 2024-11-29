@@ -102,9 +102,9 @@
                                                 id="required-icon">*</span></strong> <span
                                             id="propertyAddress_{{ $listing->id }}">{{ \Illuminate\Support\Str::title($listing->address) }}</span>
                                     </p>
-                                    <p class="ms-2"><strong>Size: <span class="text-danger d-none"
+                                    <p class="ms-2"><strong>Size (Square Meters): <span class="text-danger d-none"
                                                 id="required-icon">*</span></strong> <span
-                                            id="propertySize_{{ $listing->id }}">{{ $listing->size }}m²</span></p>
+                                            id="propertySize_{{ $listing->id }}">{{ $listing->size }}</span></p>
                                 </div>
                                 <div class="col-6">
                                     <p class="ms-2"><strong>Bedrooms:</strong> <span
@@ -114,7 +114,7 @@
                                     </p>
                                     <p class="ms-2"><strong>Garage:</strong> <span
                                             id="propertyGarage_{{ $listing->id }}">{{ $listing->garage }}</span></p>
-                                    <p class="ms-2"><strong>Price: <span class="text-danger d-none"
+                                    <p class="ms-2"><strong>Price (₱): <span class="text-danger d-none"
                                                 id="required-icon">*</span></strong> <span
                                             id="propertyPrice_{{ $listing->id }}">{{ $listing->price }}</span></p>
                                 </div>
