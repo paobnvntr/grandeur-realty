@@ -21,12 +21,12 @@
     </div>
 </div>
 
-<div class="section">
+<div class="section p-2">
     <div class="container">
         <div class="row">
-            <div class="col-lg-4 mb-5 mb-lg-0" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-lg-4 mb-4 mb-lg-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="contact-info">
-                    <h4 class="mb-4">What are you:</h4>
+                    <h4 class="mb-4 mt-4">What are you:</h4>
                     <div class="mt-4 broker-info select-type">
                         <div class="broker-container">
                             <i class="icon-briefcase me-2"></i>
@@ -46,7 +46,7 @@
                 </div>
             </div>
 
-            <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
+            <div class="col-lg-8 mt-4" data-aos="fade-up" data-aos-delay="200">
                 <form id="propertyForm" action="{{ route('saveListWithUs') }}" method="POST"
                     enctype="multipart/form-data" class="d-none">
                     @csrf
@@ -221,7 +221,7 @@
                                     Conditions</span> of Grandeur Realty.</label>
                         </div>
 
-                        <div class="col-12 d-flex justify-content-end">
+                        <div class="col-12 d-flex justify-content-end mt-4 mb-4">
                             <button type="button" class="btn btn-primary" id="createListWithUsBtn">Submit
                                 Listing</button>
                         </div>
@@ -351,7 +351,7 @@
 
         uploadedImages.forEach((fileObject, index) => {
             const col = document.createElement('div');
-            col.classList.add('col-md-3', 'mb-3', 'text-center', 'position-relative');
+            col.classList.add('col-4', 'col-lg-3', 'mb-3', 'text-center', 'position-relative');
 
             const img = document.createElement('img');
             img.src = fileObject.data;

@@ -22,7 +22,7 @@
     </div>
 </div>
 
-<div class="section">
+<div class="section p-2">
     <div class="container">
         <div class="row">
             <div class="col-lg-4 mb-5 mb-lg-0" data-aos="fade-up" data-aos-delay="100">
@@ -56,7 +56,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
+            <div class="col-lg-8 mt-4" data-aos="fade-up" data-aos-delay="200">
                 <form action="{{ route('saveContactUs') }}" method="POST" enctype="multipart/form-data"
                     id="createContactUsForm">
                     @csrf
@@ -111,7 +111,7 @@
                                     Conditions</span> of Grandeur Realty.</label>
                         </div>
 
-                        <div class="col-12 d-flex justify-content-end">
+                        <div class="col-12 d-flex justify-content-end mt-4 mb-4">
                             <button type="button" class="btn btn-primary" id="createContactUsBtn">Send Message</button>
                         </div>
                     </div>

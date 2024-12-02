@@ -13,7 +13,7 @@
     <div class="container">
         <div class="row justify-content-center align-items-center">
             <div class="col-lg-9 text-center">
-                <div class="sub-heading text-uppercase mb-4" data-aos="fade-up">Welcome To
+                <div class="sub-heading text-uppercase mb-4" data-aos="fade-up">Welcome To <br class="d-sm-none">
                     Grandeur Realty!</div>
                 <h1 class="heading" data-aos="fade-up" data-aos-delay="100">
                     Your Needs, Our Priority: Buy, Sell, Lease with Ease
@@ -26,18 +26,21 @@
 <div class="section" id="hot-properties">
     <div class="container">
         <div class="row mb-5 align-items-center" data-aos="fade-up">
-            <div class="col-lg-6">
+            <div class="col-7">
                 <h2 class="fw-bolder text-primary heading">
                     Hot Properties
                 </h2>
             </div>
 
-            <div class="col-lg-6 text-lg-end">
+            <div class="col-5 text-end">
                 <p>
-                    <a href="{{ route('allProperties') }}" class="btn btn-primary py-3 px-4">View All
-                        Properties</a>
+                    <a href="{{ route('allProperties') }}"
+                        class="btn btn-primary py-3 px-4 d-none d-sm-inline-block">View All Properties</a>
+                    <a href="{{ route('allProperties') }}" class="btn btn-primary btn-sm d-inline-block d-sm-none">View
+                        All</a>
                 </p>
             </div>
+
         </div>
 
         <div class="container mt-5">
@@ -61,7 +64,7 @@
     <div class="container">
         <div class="row">
             @foreach ($features as $feature)
-                <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="col-6 col-lg-3 mb-2 mt-2" data-aos="fade-up" data-aos-delay="100">
                     <div class="box-feature">
                         <span class="{{ $feature['icon'] }}"></span>
                         <h3 class="mb-3">{{ $feature['title'] }}</h3>

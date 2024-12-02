@@ -40,7 +40,7 @@
 
     <div class="site-navbar site-navbar-target js-sticky-header">
         <div class="container">
-            <div class="row align-items-center">
+            <div class="row align-items-center p-2">
                 <div class="col-3">
                     <img class="my-0 site-logo" src="{{ asset('images/grandeur-realty-transparent.png') }}"
                         alt="Grandeur Realty Logo">
@@ -63,8 +63,8 @@
                     <nav class="site-navigation text-right" role="navigation">
                         <div class="container">
                             <div class="d-inline-block d-lg-none ml-md-0 mr-auto py-3"><a href="#"
-                                    class="site-menu-toggle js-menu-toggle text-white"><span
-                                        class="icon-menu h3"></span></a></div>
+                                    class="site-menu-toggle js-menu-toggle"><span
+                                        class="icon-menu"></span></a></div>
 
                             <ul class="site-menu main-menu js-clone-nav d-none d-lg-block">
                                 <li><a href="{{ route('home') }}#home" class="nav-link">Home</a></li>

@@ -75,7 +75,8 @@
                 </div>
 
                 <div class="col-md-2 d-flex align-items-center justify-content-between">
-                    <button type="reset" class="btn text-danger me-4">Reset</button>
+                    <button type="reset" class="btn text-danger me-4 d-none d-sm-inline-block">Reset</button>
+                    <button type="reset" class="btn text-danger d-inline-block d-sm-none">Reset</button>
                     <button type="button" id="searchButton" class="btn btn-primary">Search</button>
                 </div>
             </div>
@@ -85,14 +86,14 @@
 
 <div class="section pt-0">
     <div class="container">
-        <div class="d-flex justify-content-between">
-            <div class="filter-buttons mb-4">
+        <div class="row d-flex justify-content-between">
+            <div class="col-9 filter-buttons mb-4">
                 <button data-filter="all" class="btn btn-outline-primary filter-btn active">All</button>
                 <button data-filter="sale" class="btn btn-outline-primary filter-btn">For Sale</button>
                 <button data-filter="rent" class="btn btn-outline-primary filter-btn">For Rent</button>
             </div>
 
-            <div class="sort-by mb-4">
+            <div class="col-3 sort-by mb-4">
                 <select id="sortDropdown" class="form-select">
                     <option value="default" selected>Default Order</option>
                     <option value="price-asc">Price (Low to High)</option>
@@ -222,7 +223,7 @@
 
                 // Property Element
                 const propertyElement = `
-            <div class="col-4 property-card" data-status="${property.property_status}" data-created-at="${property.created_at}">
+            <div class="col-12 col-md-4 property-card" data-status="${property.property_status}" data-created-at="${property.created_at}">
                 <div class="property-item mb-30 position-relative shadow-sm">
                     <div class="ribbon ${property.property_status === 'sale' ? 'ribbon-sale' : 'ribbon-rent'}">
                         For ${property.property_status.charAt(0).toUpperCase() + property.property_status.slice(1)}

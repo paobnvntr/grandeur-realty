@@ -23,7 +23,6 @@
 				controls: false,
 				nav: false,
 				autoplayButtonOutput: false,
-				controlsContainer: '#hero-nav',
 			});
 		}
 
