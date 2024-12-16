@@ -9,5 +9,5 @@ class HotProperties extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['city', 'image', 'priority'];
+    protected $fillable = ['city', 'title', 'image', 'priority'];
 }

@@ -24,7 +24,7 @@
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
                     </div>
-                    
+
                     <div class="col-12 mb-3">
                         <label for="city" class="form-label">City <span class="text-danger">*</span></label>
                         <select id="city" name="city" class="form-select @error('city') is-invalid @enderror" required>
@@ -34,6 +34,20 @@
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
                     </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="title" class="form-label">Custom Title</label>
+                        <input type="text" name="title" class="form-control @error('title') is-invalid @enderror"
+                            id="title">
+                        @error('title')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                        <p class="form-text text-muted ms-2">
+                            Must be unique <br>
+                            Leave blank to use default title
+                        </p>
+                    </div>
+
                     <div class="form-group">
                         <label for="image-upload">Upload Background Image</label>
                         <input type="file" name="image" class="form-control @error('image') is-invalid @enderror"
@@ -43,6 +57,11 @@
                                 {{ $message }}
                             </div>
                         @enderror
+                        <p class="form-text text-muted ms-2">
+                            Maximum file size: 5 MB <br>
+                            Recommended size: 1366 x 696 pixels <br>
+                            Acceptable formats: .jpg, .jpeg, .png
+                        </p>
                     </div>
                 </div>
                 <div class="modal-footer">

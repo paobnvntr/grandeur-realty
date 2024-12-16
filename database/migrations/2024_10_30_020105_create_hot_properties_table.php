@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('hot_properties', function (Blueprint $table) {
             $table->id();
             $table->string('city')->unique();
+            $table->string('title')->nullable()->unique();
             $table->string('image')->nullable();
             $table->integer('priority');
             $table->timestamps();

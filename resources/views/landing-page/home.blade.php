@@ -50,7 +50,13 @@
                         <a href="{{ route('hotProperties', ['city' => $city->city]) }}" class="city-card"
                             style="background-image: url('{{ $city->image_url }}');">
                             <div class="city-overlay">
-                                <span class="city-name">{{ $city->city }}</span>
+                                <span class="city-name">
+                                    @if (!is_null($city->title))
+                                        {{ $city->title }}
+                                    @else
+                                        {{ $city->city }}
+                                    @endif
+                                </span>
                             </div>
                         </a>
                     </div>

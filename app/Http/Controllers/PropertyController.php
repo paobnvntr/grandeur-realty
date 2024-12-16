@@ -357,12 +357,26 @@ class PropertyController extends Controller
 
     public function validateAddHotPropertiesForm(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            '_token' => 'required',
-            'slot' => 'required|numeric',
-            'city' => 'required|unique:hot_properties,city',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                '_token' => 'required',
+                'slot' => 'required|numeric',
+                'city' => 'required|unique:hot_properties,city',
+                'title' => 'nullable|unique:hot_properties,title',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            ],
+            [
+                'slot.required' => 'Please select a slot.',
+                'slot.numeric' => 'The slot must be a number.',
+                'city.required' => 'Please enter a city name.',
+                'city.unique' => 'The city already exists.',
+                'title.unique' => 'The title already exists.',
+                'image.image' => 'The uploaded file must be an image.',
+                'image.mimes' => 'The uploaded image must be a type of: jpeg, png, jpg',
+                'image.max' => 'The uploaded image must not be greater than 5MB.',
+            ]
+        );
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
@@ -384,6 +398,7 @@ class PropertyController extends Controller
 
         $addHotProperties = HotProperties::create([
             'city' => $city,
+            'title' => $this->addHotPropertiesTitle($request),
             'image' => $this->uploadAddHotPropertiesImage($request, $city),
             'priority' => $request->slot,
             'created_at' => now('Asia/Manila'),
@@ -401,11 +416,16 @@ class PropertyController extends Controller
         }
     }
 
+    private function addHotPropertiesTitle($request)
+    {
+        return $request->title ? trim($request->title) : null;
+    }
+
     private function uploadAddHotPropertiesImage($request, $city)
     {
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            // Generate a filename using the city name and current timestamp
+
             $fileName = strtolower(str_replace([' ', ','], '_', $city)) . '_' . time() . '.' . $image->getClientOriginalExtension(); // Create the new filename
 
             $image->move(public_path('uploads/hot_properties'), $fileName); // Move the file to the unique folder
@@ -447,13 +467,15 @@ class PropertyController extends Controller
             [
                 '_token' => 'required',
                 'city' => 'required',
-                'image_edit' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                'title_edit' => 'nullable|unique:hot_properties,title',
+                'image_edit' => 'required|image|mimes:jpeg,png,jpg|max:5120',
             ],
             [
+                'title_edit.unique' => 'The title already exists.',
                 'image_edit.required' => 'Please upload an image.',
                 'image_edit.image' => 'The uploaded file must be an image.',
                 'image_edit.mimes' => 'The uploaded image must be a type of: jpeg, png, jpg',
-                'image_edit.max' => 'The uploaded image must not be greater than 2MB.',
+                'image_edit.max' => 'The uploaded image must not be greater than 5MB.',
             ]
         );
 
@@ -475,7 +497,8 @@ class PropertyController extends Controller
         $this->deleteExistingImage($hotPropertiesImage->image);
 
         $editHotProperties = $hotPropertiesImage->update([
-            'image' => $this->uploadHotPropertiesImage($request, $city),
+            'title' => $this->editHotPropertiesTitle($request),
+            'image' => $this->editHotPropertiesImage($request, $city),
             'updated_at' => now('Asia/Manila'),
         ]);
 
@@ -488,6 +511,22 @@ class PropertyController extends Controller
 
             return redirect()->route('properties.editHotProperties')->with('error', 'Failed to update hot properties image!');
         }
+    }
+
+    private function editHotPropertiesTitle($request)
+    {
+        return $request->title_edit ? trim($request->title_edit) : null;
+    }
+
+    private function editHotPropertiesImage($request, $city)
+    {
+        $image = $request->file('image_edit');
+
+        $fileName = strtolower(str_replace([' ', ','], '_', $city)) . '_' . time() . '.' . $image->getClientOriginalExtension(); // Create the new filename
+
+        $image->move(public_path('uploads/hot_properties'), $fileName); // Move the file to the unique folder
+
+        return $fileName;
     }
 
     private function deleteExistingImage($image)

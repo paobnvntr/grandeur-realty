@@ -59,7 +59,20 @@
                                                     @include('admin.properties.partials.removeHotProperties')
                                                 @endif
                                                 <div class="city-overlay">
-                                                    <span class="city-name">{{ $city ? $city->city : 'No City' }}</span>
+                                                    @if ($city)
+                                                        <span class="city-name text-center">
+                                                            @if (!is_null($city->title))
+                                                                {{ $city->title }}
+                                                                <p class="form-text text-muted">
+                                                                    ({{ $city->city }})
+                                                                </p>
+                                                            @else
+                                                                {{ $city->city }}
+                                                            @endif
+                                                        </span>
+                                                    @else
+                                                        <span class="city-name">No City</span>
+                                                    @endif
                                                 </div>
                                             </a>
                                         </div>
@@ -73,17 +86,36 @@
                         @csrf
                         <input type="hidden" name="city" id="city-name-input">
                         <div class="form-group">
+                            <label for="title" class="form-label">Custom Title</label>
+                            <input type="text" name="title_edit"
+                                class="form-control @error('title_edit') is-invalid @enderror" id="title-edit">
+                            @error('title_edit')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                            <p class="form-text text-muted ms-2">
+                                Must be unique <br>
+                                Leave blank to use default title
+                            </p>
+                        </div>
+                        <div class="form-group">
                             <label for="image-upload">Upload New Background Image for <strong><span
                                         id="city-name-label"></span></strong>:</span> <span
                                     class="text-danger">*</span></label>
                             <input type="file" name="image_edit"
-                                class="form-control @error('image_edit') is-invalid @enderror" id="image-upload"
-                                accept=".jpg, .jpeg, .png" required>
+                                class="form-control @error('image_edit') is-invalid @enderror"
+                                id="image-upload-placeholder" accept=".jpg, .jpeg, .png" required>
                             @error('image_edit')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
                             @enderror
+                            <p class="form-text text-muted ms-2">
+                                Maximum file size: 5 MB <br>
+                                Recommended size: 1366 x 696 pixels <br>
+                                Acceptable formats: .jpg, .jpeg, .png
+                            </p>
                         </div>
                         <div class="mt-3 d-flex align-items-center justify-content-end">
                             <button type="button" class="btn btn-warning me-2" id="save-image-btn">Edit Image</button>
